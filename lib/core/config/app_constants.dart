@@ -1,0 +1,25 @@
+class AppConstants {
+  static const List<String> genres = [
+    'All Books',
+    'Fiction',
+    'Non-Fiction',
+    'Mystery & Thriller',
+    'Science Fiction & Fantasy',
+    'Romance',
+    'Biography & Memoir',
+    'History',
+    'Self-Help',
+    'Business & Economics',
+    'Health & Fitness',
+    'Cooking & Food',
+    'Travel',
+    'Children\'s Books',
+    'Young Adult',
+    'Educational & Textbooks',
+    'Art & Design',
+    'Religion & Spirituality',
+    'Philosophy',
+    'Poetry',
+    'Comics & Graphic Novels',
+  ];
+}

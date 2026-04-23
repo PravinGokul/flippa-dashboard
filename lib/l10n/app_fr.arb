@@ -1,0 +1,12 @@
+{
+  "appTitle": "Flippa",
+  "listBook": "Lister un livre",
+  "recommendedForYou": "Recommandé pour vous",
+  "trendingNearYou": "Tendances près de chez vous",
+  "buy": "Acheter",
+  "rent": "Louer",
+  "bid": "Enchérir",
+  "getAiSuggestion": "Obtenir une suggestion de prix AI",
+  "suggestedPrice": "Prix suggéré",
+  "reason": "Raison"
+}

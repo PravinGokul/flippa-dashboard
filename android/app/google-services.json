@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "593690288781",
+    "project_id": "flippa-18c94",
+    "storage_bucket": "flippa-18c94.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:593690288781:android:2a6bd779d4b666067738c4",
+        "android_client_info": {
+          "package_name": "com.xerxes.flippa.flippa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "593690288781-uuru4to8hq90nnoilm6ook6rbg0qva1e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.xerxes.flippa.flippa",
+            "certificate_hash": "e7918ca0ed0f2e7bd564fbd7a50c0432549b5285"
+          }
+        },
+        {
+          "client_id": "593690288781-kk9jddhlpdpbu83rtm2jteo8ao20hvsv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRXWszZZmbmsNXS6FLuAgEd2kkYsRQgm4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "593690288781-kk9jddhlpdpbu83rtm2jteo8ao20hvsv.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "593690288781-ga444v0t8i7ehs3ajo53o3j1r7o1b44o.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.xerxes.flippa.flippa"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

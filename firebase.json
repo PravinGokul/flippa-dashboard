@@ -1,0 +1,63 @@
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "functions": {
+    "source": "functions"
+  },
+  "emulators": {
+    "auth": {
+      "port": 9099
+    },
+    "functions": {
+      "port": 5001
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "ui": {
+      "enabled": true
+    },
+    "singleProjectMode": true
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "flippa-18c94",
+          "appId": "1:593690288781:android:2a6bd779d4b666067738c4",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options_generated.dart": {
+          "projectId": "flippa-18c94",
+          "configurations": {
+            "android": "1:593690288781:android:2a6bd779d4b666067738c4"
+          }
+        },
+        "lib/firebase_options_ios.dart": {
+          "projectId": "flippa-18c94",
+          "configurations": {
+            "ios": "1:593690288781:ios:3cfd207fa4aa58d27738c4"
+          }
+        },
+        "lib/firebase_options_web.dart": {
+          "projectId": "flippa-18c94",
+          "configurations": {
+            "web": "1:593690288781:web:d2f8dd2028a5853d7738c4"
+          }
+        },
+        "lib/firebase_options.dart": {
+          "projectId": "flippa-18c94",
+          "configurations": {
+            "android": "1:593690288781:android:2a6bd779d4b666067738c4",
+            "ios": "1:593690288781:ios:3cfd207fa4aa58d27738c4",
+            "macos": "1:593690288781:ios:3cfd207fa4aa58d27738c4",
+            "web": "1:593690288781:web:d2f8dd2028a5853d7738c4"
+          }
+        }
+      }
+    }
+  }
+}

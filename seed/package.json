@@ -1,0 +1,20 @@
+{
+    "name": "flippa-seed",
+    "version": "1.0.0",
+    "description": "Production-grade seeding tool for Flippa",
+    "main": "run.ts",
+    "scripts": {
+        "seed": "tsx run.ts"
+    },
+    "dependencies": {
+        "firebase-admin": "^12.0.0",
+        "pg": "^8.11.0",
+        "uuid": "^10.0.0"
+    },
+    "devDependencies": {
+        "@types/node": "^20.0.0",
+        "@types/pg": "^8.11.0",
+        "tsx": "^4.0.0",
+        "typescript": "^5.0.0"
+    }
+}

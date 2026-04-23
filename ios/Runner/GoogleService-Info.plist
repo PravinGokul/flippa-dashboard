@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>593690288781-ga444v0t8i7ehs3ajo53o3j1r7o1b44o.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.593690288781-ga444v0t8i7ehs3ajo53o3j1r7o1b44o</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>593690288781-uuru4to8hq90nnoilm6ook6rbg0qva1e.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyA04kn-pLdeP5jRY1KIe6bjT0Ko1mRKx9w</string>
+	<key>GCM_SENDER_ID</key>
+	<string>593690288781</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.xerxes.flippa.flippa</string>
+	<key>PROJECT_ID</key>
+	<string>flippa-18c94</string>
+	<key>STORAGE_BUCKET</key>
+	<string>flippa-18c94.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:593690288781:ios:3cfd207fa4aa58d27738c4</string>
+</dict>
+</plist>

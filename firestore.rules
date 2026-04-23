@@ -1,0 +1,66 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // --- Helper Functions ---
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(userId) { return request.auth.uid == userId; }
+    function hasRole(role) { return isSignedIn() && request.auth.token.role == role; }
+    function isAdmin() { return hasRole('admin'); }
+
+    // --- Users Collection ---
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isOwner(userId);
+      allow update: if isSignedIn() && isOwner(userId) && 
+        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'is_blocked']));
+      allow write: if isAdmin();
+    }
+
+    // --- Listings Collection ---
+    match /listings/{listingId} {
+      allow read: if true;
+      allow create: if hasRole('individual_seller') || hasRole('business_seller') || isAdmin();
+      allow update: if (isSignedIn() && resource.data.owner_user_id == request.auth.uid) || isAdmin();
+      allow delete: if isAdmin();
+
+      // Availability sub-collection
+      match /availability/{date} {
+        allow read: if true;
+        // availability is managed system-side by Cloud Functions
+        allow write: if isAdmin();
+      }
+    }
+
+    // --- Orders & Rentals (SERVER ONLY) ---
+    match /orders/{orderId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      // Orders must be created via Cloud Function bookRental
+      allow write: if isAdmin();
+    }
+
+    match /rentals/{rentalId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      // Rentals must be created via Cloud Function bookRental
+      allow write: if isAdmin();
+    }
+
+    // --- Events (Recommendation Engine) ---
+    match /events/{eventId} {
+      allow read: if isAdmin();
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+    }
+
+    // --- Audit Logs (IMMUTABLE, ADMIN READ-ONLY) ---
+    match /audit_logs/{logId} {
+      allow read: if isAdmin();
+      // Writing is strictly handled by Cloud Functions (Server-Only)
+      allow write: if false;
+    }
+
+    // --- Default Deny ---
+    match /{path=**} {
+      allow read, write: if isAdmin();
+    }
+  }
+}

@@ -1,0 +1,136 @@
+[
+    {
+        "id": "book_1",
+        "owner_id": "seller_1",
+        "title": "The Midnight Library",
+        "author": "Matt Haig",
+        "description": "Between life and death there is a library...",
+        "category": "Fiction",
+        "section": "trending",
+        "selling_price": 6.99,
+        "original_price": 8.99,
+        "discount": "22% OFF",
+        "rating": 4.8,
+        "rating_count": 1250,
+        "badges": [
+            "Bestseller",
+            "Trending"
+        ],
+        "image": "https://m.media-amazon.com/images/I/81P6j0lTofL._SY466_.jpg",
+        "created_at": "2024-02-01T10:00:00Z"
+    },
+    {
+        "id": "book_2",
+        "owner_id": "seller_2",
+        "title": "Klara and the Sun",
+        "author": "Kazuo Ishiguro",
+        "description": "The story of Klara, an Artificial Friend...",
+        "category": "Sci-Fi",
+        "section": "trending",
+        "selling_price": 1.99,
+        "original_price": 14.99,
+        "discount": "86% OFF",
+        "rating": 4.6,
+        "rating_count": 890,
+        "badges": [
+            "Nobel Prize"
+        ],
+        "image": "https://m.media-amazon.com/images/I/71R17fP3YlL._SY466_.jpg",
+        "created_at": "2024-02-02T12:00:00Z"
+    },
+    {
+        "id": "book_3",
+        "owner_id": "seller_3",
+        "title": "Tomorrow, and Tomorrow, and Tomorrow",
+        "author": "Gabrielle Zevin",
+        "description": "Spanning thirty years of friendship, love, and world-building...",
+        "category": "Literary Fiction",
+        "section": "trending",
+        "selling_price": 6.99,
+        "original_price": 18.00,
+        "discount": "61% OFF",
+        "rating": 4.7,
+        "rating_count": 2100,
+        "badges": [
+            "Editor's Choice"
+        ],
+        "image": "https://m.media-amazon.com/images/I/91rP6643EFL._SY466_.jpg",
+        "created_at": "2024-02-03T10:00:00Z"
+    },
+    {
+        "id": "book_4",
+        "owner_id": "seller_4",
+        "title": "Tomorrow, and Tomorrow, and Tomorrow",
+        "author": "Sam Dennan",
+        "description": "A different edition or take on the classic theme.",
+        "category": "Modern",
+        "section": "new_releases",
+        "selling_price": 8.99,
+        "original_price": 12.99,
+        "discount": "30% OFF",
+        "rating": 4.5,
+        "rating_count": 340,
+        "badges": [
+            "New Arrival"
+        ],
+        "image": "https://m.media-amazon.com/images/I/717vOn6I7rL._SY466_.jpg",
+        "created_at": "2024-02-04T15:00:00Z"
+    },
+    {
+        "id": "book_5",
+        "owner_id": "seller_1",
+        "title": "Klara and the Sun (Special Edition)",
+        "author": "Denie Ne",
+        "description": "Unique special edition with custom artwork.",
+        "category": "Collectors",
+        "section": "new_releases",
+        "selling_price": 1.39,
+        "original_price": 25.00,
+        "discount": "Huge Sale",
+        "rating": 4.9,
+        "rating_count": 120,
+        "badges": [
+            "Limited"
+        ],
+        "image": "https://m.media-amazon.com/images/I/71R17fP3YlL._SY466_.jpg",
+        "created_at": "2024-02-05T09:00:00Z"
+    },
+    {
+        "id": "author_1",
+        "owner_id": "seller_5",
+        "title": "Josh Winteman",
+        "author": "Coal Author",
+        "description": "Digital portrait session or signed collection.",
+        "category": "Author Spot",
+        "section": "local_authors",
+        "selling_price": 23.00,
+        "original_price": 30.00,
+        "discount": "Promo",
+        "rating": 5.0,
+        "rating_count": 45,
+        "badges": [
+            "Recommended"
+        ],
+        "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300&h=300",
+        "created_at": "2024-02-06T11:00:00Z"
+    },
+    {
+        "id": "author_2",
+        "owner_id": "seller_2",
+        "title": "Saran Tinnin",
+        "author": "By Bars Smith",
+        "description": "Autographed series or consulting session.",
+        "category": "Author Spot",
+        "section": "local_authors",
+        "selling_price": 28.00,
+        "original_price": 40.00,
+        "discount": "Verified",
+        "rating": 4.8,
+        "rating_count": 12,
+        "badges": [
+            "Expert"
+        ],
+        "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300&h=300",
+        "created_at": "2024-02-07T14:00:00Z"
+    }
+]
