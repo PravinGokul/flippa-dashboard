@@ -12,12 +12,11 @@
         "discount": "22% OFF",
         "rating": 4.8,
         "rating_count": 1250,
-        "badges": [
-            "Bestseller",
-            "Trending"
-        ],
+        "badges": ["Bestseller", "Trending"],
         "image": "https://m.media-amazon.com/images/I/81P6j0lTofL._SY466_.jpg",
-        "created_at": "2024-02-01T10:00:00Z"
+        "created_at": "2024-02-01T10:00:00Z",
+        "latitude": 28.6139,
+        "longitude": 77.2090
     },
     {
         "id": "book_2",
@@ -32,11 +31,11 @@
         "discount": "86% OFF",
         "rating": 4.6,
         "rating_count": 890,
-        "badges": [
-            "Nobel Prize"
-        ],
+        "badges": ["Nobel Prize"],
         "image": "https://m.media-amazon.com/images/I/71R17fP3YlL._SY466_.jpg",
-        "created_at": "2024-02-02T12:00:00Z"
+        "created_at": "2024-02-02T12:00:00Z",
+        "latitude": 28.6200,
+        "longitude": 77.2200
     },
     {
         "id": "book_3",
@@ -51,11 +50,11 @@
         "discount": "61% OFF",
         "rating": 4.7,
         "rating_count": 2100,
-        "badges": [
-            "Editor's Choice"
-        ],
+        "badges": ["Editor's Choice"],
         "image": "https://m.media-amazon.com/images/I/91rP6643EFL._SY466_.jpg",
-        "created_at": "2024-02-03T10:00:00Z"
+        "created_at": "2024-02-03T10:00:00Z",
+        "latitude": 28.6300,
+        "longitude": 77.2300
     },
     {
         "id": "book_4",
@@ -70,11 +69,11 @@
         "discount": "30% OFF",
         "rating": 4.5,
         "rating_count": 340,
-        "badges": [
-            "New Arrival"
-        ],
+        "badges": ["New Arrival"],
         "image": "https://m.media-amazon.com/images/I/717vOn6I7rL._SY466_.jpg",
-        "created_at": "2024-02-04T15:00:00Z"
+        "created_at": "2024-02-04T15:00:00Z",
+        "latitude": 28.6000,
+        "longitude": 77.2000
     },
     {
         "id": "book_5",
@@ -89,11 +88,11 @@
         "discount": "Huge Sale",
         "rating": 4.9,
         "rating_count": 120,
-        "badges": [
-            "Limited"
-        ],
+        "badges": ["Limited"],
         "image": "https://m.media-amazon.com/images/I/71R17fP3YlL._SY466_.jpg",
-        "created_at": "2024-02-05T09:00:00Z"
+        "created_at": "2024-02-05T09:00:00Z",
+        "latitude": 28.6100,
+        "longitude": 77.2500
     },
     {
         "id": "author_1",
@@ -108,11 +107,11 @@
         "discount": "Promo",
         "rating": 5.0,
         "rating_count": 45,
-        "badges": [
-            "Recommended"
-        ],
+        "badges": ["Recommended"],
         "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300&h=300",
-        "created_at": "2024-02-06T11:00:00Z"
+        "created_at": "2024-02-06T11:00:00Z",
+        "latitude": 28.6500,
+        "longitude": 77.2000
     },
     {
         "id": "author_2",
@@ -127,10 +126,10 @@
         "discount": "Verified",
         "rating": 4.8,
         "rating_count": 12,
-        "badges": [
-            "Expert"
-        ],
+        "badges": ["Expert"],
         "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300&h=300",
-        "created_at": "2024-02-07T14:00:00Z"
+        "created_at": "2024-02-07T14:00:00Z",
+        "latitude": 28.6400,
+        "longitude": 77.2200
     }
 ]

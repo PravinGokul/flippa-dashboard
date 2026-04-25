@@ -19,6 +19,8 @@ class ListingModel {
   final List<String>? badges;
   final String? section;
   final DateTime? createdAt;
+  final double? latitude;
+  final double? longitude;
 
   ListingModel({
     required this.id,
@@ -41,6 +43,8 @@ class ListingModel {
     this.badges,
     this.section,
     this.createdAt,
+    this.latitude,
+    this.longitude,
   });
 
   factory ListingModel.fromJson(Map<String, dynamic> json) {
@@ -67,6 +71,8 @@ class ListingModel {
       badges: (json['badges'] as List<dynamic>?)?.map((e) => e as String).toList(),
       section: json['section'] as String?,
       createdAt: json['created_at'] != null ? DateTime.parse(json['created_at'] as String) : null,
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
     );
   }
 
@@ -92,6 +98,8 @@ class ListingModel {
       'badges': badges,
       'section': section,
       'created_at': createdAt?.toIso8601String(),
+      'latitude': latitude,
+      'longitude': longitude,
     };
   }
 }

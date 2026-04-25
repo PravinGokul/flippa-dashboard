@@ -23,6 +23,9 @@ import 'package:flippa/features/marketplace/listings/listings_event.dart';
 import 'package:flippa/features/marketplace/listings/listings_state.dart';
 import 'package:flippa/core/utils/seed_service.dart';
 import 'package:flippa/core/auth/auth_service.dart';
+import 'package:flippa/ui/widgets/shimmer_loader.dart';
+
+import 'package:flippa/core/services/location_service.dart';
 
 class ListingGridScreen extends StatefulWidget {
   const ListingGridScreen({super.key});
@@ -37,10 +40,17 @@ class _ListingGridScreenState extends State<ListingGridScreen> {
   @override
   void initState() {
     super.initState();
-    // Trigger initial fetch using the repository gate
-    context.read<ListingsBloc>().add(FetchListings());
-    
+    _initFetch();
     _scrollController.addListener(_onScroll);
+  }
+
+  Future<void> _initFetch() async {
+    final location = await LocationService.getCurrentLocation();
+    if (location != null) {
+      context.read<ListingsBloc>().add(FetchProximityListings(location.latitude, location.longitude));
+    } else {
+      context.read<ListingsBloc>().add(FetchListings());
+    }
   }
 
   @override
@@ -59,7 +69,6 @@ class _ListingGridScreenState extends State<ListingGridScreen> {
     if (!_scrollController.hasClients) return false;
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.offset;
-    // Trigger when user is 200px from bottom for smoother transition
     return currentScroll >= (maxScroll * 0.8);
   }
 
@@ -79,31 +88,24 @@ class _ListingGridScreenState extends State<ListingGridScreen> {
             children: [
               const Text(
                 'Flippa',
-                style: TextStyle(
-                  color: Color(0xFF1E1E2C),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 22,
-                ),
+                style: TextStyle(color: Color(0xFF1E1E2C), fontWeight: FontWeight.bold, fontSize: 22),
               ),
               const SizedBox(width: 40),
               _buildSearchBar(),
               const Spacer(),
               _buildListBookButton(context),
               const SizedBox(width: 24),
+              _buildNearMeButton(context),
+              const SizedBox(width: 24),
               _buildGenreDropdown(),
               const SizedBox(width: 24),
               _buildHeaderAction(Icons.favorite_border, () {}),
               const SizedBox(width: 16),
-              // Prototype Seeding Trigger
               _buildHeaderAction(Icons.auto_awesome, () async {
                 final scaffoldMessenger = ScaffoldMessenger.of(context);
-                scaffoldMessenger.showSnackBar(
-                  const SnackBar(content: Text('Starting Live Data Seed...')),
-                );
+                scaffoldMessenger.showSnackBar(const SnackBar(content: Text('Starting Live Data Seed...')));
                 await SeedService().seedListings();
-                scaffoldMessenger.showSnackBar(
-                  const SnackBar(content: Text('Seed Complete! Restart app to see live Firestore data.')),
-                );
+                scaffoldMessenger.showSnackBar(const SnackBar(content: Text('Seed Complete!')));
               }),
               const SizedBox(width: 16),
               _buildLanguagePicker(context),
@@ -122,11 +124,7 @@ class _ListingGridScreenState extends State<ListingGridScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFE8EAF6), // Soft lavender
-              Color(0xFFEDE7F6), // Soft purple
-              Color(0xFFF1F5F9), // Very light blue
-            ],
+            colors: [Color(0xFFE8EAF6), Color(0xFFEDE7F6), Color(0xFFF1F5F9)],
           ),
         ),
         child: SingleChildScrollView(
@@ -139,7 +137,14 @@ class _ListingGridScreenState extends State<ListingGridScreen> {
               BlocBuilder<ListingsBloc, ListingsState>(
                 builder: (context, state) {
                   if (state is ListingsLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return Column(
+                      children: [
+                        _buildHorizontalSkeleton('Trending Near You'),
+                        const SizedBox(height: 48),
+                        _buildHorizontalSkeleton('New Releases'),
+                        const SizedBox(height: 48),
+                      ],
+                    );
                   }
 
                   List<ListingModel> allListings = [];
@@ -150,14 +155,68 @@ class _ListingGridScreenState extends State<ListingGridScreen> {
                   final trending = allListings.where((l) => l.section == 'trending').toList();
                   final newReleases = allListings.where((l) => l.section == 'new_releases').toList();
                   final localAuthors = allListings.where((l) => l.section == 'local_authors').toList();
+                  
+                  // For infinite scroll, we use the remaining listings in a vertical grid
+                  final discoverMore = allListings.where((l) => 
+                    l.section != 'trending' && 
+                    l.section != 'new_releases' && 
+                    l.section != 'local_authors'
+                  ).toList();
 
                   return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                        _buildHorizontalSection('Trending Near You', trending),
                        const SizedBox(height: 48),
                        _buildHorizontalSection('New Releases', newReleases),
                        const SizedBox(height: 48),
                        _buildHorizontalSection('Local Authors', localAuthors),
+                       const SizedBox(height: 48),
+                       
+                       const Padding(
+                         padding: EdgeInsets.symmetric(horizontal: 40),
+                         child: Text(
+                           'Discover More',
+                           style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Color(0xFF1E293B)),
+                         ),
+                       ),
+                       const SizedBox(height: 24),
+                       
+                       Padding(
+                         padding: const EdgeInsets.symmetric(horizontal: 32),
+                         child: GridView.builder(
+                           shrinkWrap: true,
+                           physics: const NeverScrollableScrollPhysics(),
+                           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                             crossAxisCount: 2,
+                             childAspectRatio: 0.6,
+                             crossAxisSpacing: 16,
+                             mainAxisSpacing: 16,
+                           ),
+                           itemCount: discoverMore.length,
+                           itemBuilder: (context, index) {
+                             return ListingCard(listing: discoverMore[index]);
+                           },
+                         ),
+                       ),
+                       
+                       if (state is ListingsLoaded && !state.hasReachedMax)
+                         Padding(
+                           padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 32),
+                           child: GridView.builder(
+                             shrinkWrap: true,
+                             physics: const NeverScrollableScrollPhysics(),
+                             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                               crossAxisCount: 2,
+                               childAspectRatio: 0.6,
+                               crossAxisSpacing: 16,
+                               mainAxisSpacing: 16,
+                             ),
+                             itemCount: 2,
+                             itemBuilder: (_, __) => const ListingSkeleton(),
+                           ),
+                         ),
+                         
                        const SizedBox(height: 100),
                     ],
                   );
@@ -167,6 +226,31 @@ class _ListingGridScreenState extends State<ListingGridScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildHorizontalSkeleton(String title) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40),
+          child: Text(
+            title,
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Color(0xFF1E293B)),
+          ),
+        ),
+        const SizedBox(height: 24),
+        SizedBox(
+          height: 380,
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            scrollDirection: Axis.horizontal,
+            itemCount: 4,
+            itemBuilder: (_, __) => const ListingSkeleton(),
+          ),
+        ),
+      ],
     );
   }
 
@@ -232,6 +316,11 @@ class _ListingGridScreenState extends State<ListingGridScreen> {
         ],
       ),
       child: TextField(
+        onSubmitted: (value) {
+          if (value.isNotEmpty) {
+            context.push('/search?q=$value');
+          }
+        },
         onChanged: (value) {
           context.read<ListingsBloc>().add(SearchListings(value));
         },
@@ -542,6 +631,48 @@ class _ListingGridScreenState extends State<ListingGridScreen> {
         ),
         child: const Icon(Icons.person, color: Color(0xFF1E1E2C), size: 24),
       ),
+    );
+  }
+
+  Widget _buildNearMeButton(BuildContext context) {
+    return BlocBuilder<ListingsBloc, ListingsState>(
+      builder: (context, state) {
+        final isNearMeActive = state is ListingsLoaded && state.userLat != null;
+        
+        return InkWell(
+          onTap: _initFetch,
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: isNearMeActive ? Colors.blueAccent.withOpacity(0.1) : Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isNearMeActive ? Colors.blueAccent : const Color(0xFFF1F5F9),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.near_me_outlined, 
+                  size: 16, 
+                  color: isNearMeActive ? Colors.blueAccent : const Color(0xFF475569)
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  'Near Me',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600, 
+                    color: isNearMeActive ? Colors.blueAccent : const Color(0xFF475569), 
+                    fontSize: 13
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

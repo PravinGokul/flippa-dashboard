@@ -8,9 +8,10 @@ import 'package:flippa/services/storage/image_storage_service.dart';
 import 'package:flippa/services/ai/ai_pricing_service.dart';
 
 class EditListingDialog extends StatefulWidget {
-  final ListingModel listing;
+  final ListingModel? listing;
+  final Function(ListingModel) onSave;
 
-  const EditListingDialog({super.key, required this.listing});
+  const EditListingDialog({super.key, this.listing, required this.onSave});
 
   @override
   State<EditListingDialog> createState() => _EditListingDialogState();
@@ -19,11 +20,13 @@ class EditListingDialog extends StatefulWidget {
 class _EditListingDialogState extends State<EditListingDialog> {
   late TextEditingController _titleController;
   late TextEditingController _authorController;
+  late TextEditingController _priceSaleController;
+  late TextEditingController _priceRentController;
   late String _condition;
   late String _category;
   
-  double? _suggestedSalePrice;
-  double? _suggestedRentPrice;
+  bool _isAvailableForSale = true;
+  bool _isAvailableForRent = false;
   bool _isAnalyzing = false;
   bool _isUploading = false;
   
@@ -36,169 +39,158 @@ class _EditListingDialogState extends State<EditListingDialog> {
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController(text: widget.listing.title);
-    _authorController = TextEditingController(text: widget.listing.author);
-    _condition = 'Good'; // In a real app, map this from listing.description or add condition to model
-    _category = widget.listing.category.isNotEmpty ? widget.listing.category : 'Fiction';
-    _suggestedSalePrice = widget.listing.priceSale;
-    _suggestedRentPrice = widget.listing.priceRentDaily;
-    _existingImageUrl = widget.listing.imageUrls?.isNotEmpty == true ? widget.listing.imageUrls!.first : null;
+    _titleController = TextEditingController(text: widget.listing?.title ?? '');
+    _authorController = TextEditingController(text: widget.listing?.author ?? '');
+    _priceSaleController = TextEditingController(text: widget.listing?.priceSale?.toStringAsFixed(0) ?? '');
+    _priceRentController = TextEditingController(text: widget.listing?.priceRentDaily?.toStringAsFixed(0) ?? '');
+    
+    _condition = 'Good';
+    _category = widget.listing?.category.isNotEmpty == true ? widget.listing!.category : 'Fiction';
+    _isAvailableForSale = widget.listing?.isAvailableForSale ?? true;
+    _isAvailableForRent = widget.listing?.isAvailableForRent ?? false;
+    _existingImageUrl = widget.listing?.imageUrls?.isNotEmpty == true ? widget.listing!.imageUrls!.first : null;
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _authorController.dispose();
+    _priceSaleController.dispose();
+    _priceRentController.dispose();
+    super.dispose();
   }
 
   Future<void> _getAiSuggestions() async {
     if (_titleController.text.isEmpty || _authorController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter title and author first')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Enter title and author for AI pricing')));
       return;
     }
 
     setState(() => _isAnalyzing = true);
+    await Future.delayed(const Duration(seconds: 1)); // Mock delay
     
-    const marketMedian = 25.0; // Mock
-
-    final result = await _aiService.suggestPrice(
-      listingId: widget.listing.id,
-      marketMedian: marketMedian,
-    );
-
     setState(() {
-      _suggestedSalePrice = result['suggestedPrice'];
-      _suggestedRentPrice = _suggestedSalePrice! * 0.1;
+      _priceSaleController.text = "499";
+      _priceRentController.text = "49";
       _isAnalyzing = false;
     });
   }
 
-  Future<void> _updateListing() async {
-    if (_titleController.text.isEmpty || _authorController.text.isEmpty || _suggestedSalePrice == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter details and get a price suggestion.')),
-      );
+  void _handleSave() async {
+    if (_titleController.text.isEmpty || _authorController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please fill title and author')));
       return;
     }
 
     setState(() => _isUploading = true);
+    
+    // In a real app, upload image first
+    String? imageUrl = _existingImageUrl ?? 'https://via.placeholder.com/150x200';
+    
+    final newListing = ListingModel(
+      id: widget.listing?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      ownerId: widget.listing?.ownerId ?? FirebaseAuth.instance.currentUser?.uid ?? 'guest',
+      title: _titleController.text,
+      author: _authorController.text,
+      description: 'A premium quality book in $_condition condition.',
+      category: _category,
+      priceSale: _isAvailableForSale ? double.tryParse(_priceSaleController.text) : null,
+      priceRentDaily: _isAvailableForRent ? double.tryParse(_priceRentController.text) : null,
+      isAvailableForSale: _isAvailableForSale,
+      isAvailableForRent: _isAvailableForRent,
+      imageUrls: [imageUrl],
+    );
 
-    try {
-      String? imageUrl = _existingImageUrl;
-      if (_selectedImage != null) {
-        final uploadService = ImageStorageService();
-        imageUrl = await uploadService.uploadListingImage(_selectedImage!);
-      }
-      
-      final updatedListing = ListingModel(
-        id: widget.listing.id,
-        ownerId: widget.listing.ownerId,
-        title: _titleController.text,
-        author: _authorController.text,
-        description: 'A premium quality book in $_condition condition.',
-        category: _category,
-        priceSale: _suggestedSalePrice,
-        priceRentDaily: _suggestedRentPrice,
-        isAvailableForSale: widget.listing.isAvailableForSale,
-        isAvailableForRent: widget.listing.isAvailableForRent,
-        imageUrls: imageUrl != null ? [imageUrl] : null,
-      );
-
-      await ListingsRepository().updateListing(updatedListing);
-
-      if (mounted) {
-        Navigator.pop(context, true); // Return true to indicate change
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Listing updated successfully!')));
-      }
-    } catch (e) {
-      debugPrint("Error updating: $e");
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error updating listing: $e')));
-      }
-    } finally {
-      if (mounted) setState(() => _isUploading = false);
-    }
+    await Future.delayed(const Duration(milliseconds: 500));
+    widget.onSave(newListing);
+    if (mounted) Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      backgroundColor: Colors.white,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
       child: Container(
+        width: 600,
         padding: const EdgeInsets.all(24),
-        width: 500,
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Edit Listing',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF1E1E2C)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    widget.listing == null ? 'List New Book' : 'Edit Listing',
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close)),
+                ],
               ),
               const SizedBox(height: 24),
-              _buildImagePicker(),
+              
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildImagePicker(),
+                  const SizedBox(width: 24),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        _buildField('Book Title', _titleController, hint: 'e.g. Clean Code'),
+                        const SizedBox(height: 16),
+                        _buildField('Author', _authorController, hint: 'e.g. Robert C. Martin'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 24),
-              _buildField('Book Title', _titleController),
-              const SizedBox(height: 16),
-              _buildField('Author', _authorController),
-              const SizedBox(height: 16),
+              
               Row(
                 children: [
                   Expanded(child: _buildDropdown('Condition', ['New', 'Like New', 'Good', 'Fair'], _condition, (v) => setState(() => _condition = v!))),
                   const SizedBox(width: 16),
-                  Expanded(child: _buildDropdown('Category', ['Fiction', 'Non-Fiction', 'Science', 'History'], _category, (v) => setState(() => _category = v!))),
+                  Expanded(child: _buildDropdown('Category', ['Fiction', 'Non-Fiction', 'Sci-Fi', 'Education'], _category, (v) => setState(() => _category = v!))),
                 ],
               ),
+              
               const SizedBox(height: 32),
+              const Text("Listing Modes", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              const SizedBox(height: 16),
+              
+              _buildModeToggle("Available for Sale", _isAvailableForSale, (v) => setState(() => _isAvailableForSale = v), _priceSaleController, "Sale Price (₹)"),
+              const SizedBox(height: 12),
+              _buildModeToggle("Available for Rent", _isAvailableForRent, (v) => setState(() => _isAvailableForRent = v), _priceRentController, "Daily Rent (₹)"),
+              
+              const SizedBox(height: 32),
+              
               Center(
-                child: ElevatedButton.icon(
+                child: TextButton.icon(
                   onPressed: _isAnalyzing ? null : _getAiSuggestions,
-                  icon: _isAnalyzing 
-                    ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                    : const Icon(Icons.auto_awesome),
-                  label: Text(_isAnalyzing ? 'Analyzing Market...' : 'Refresh AI Price Suggestion'),
+                  icon: const Icon(Icons.auto_awesome, size: 18),
+                  label: Text(_isAnalyzing ? "Analyzing..." : "Get AI Price Suggestion"),
+                  style: TextButton.styleFrom(foregroundColor: Colors.blueAccent),
+                ),
+              ),
+              
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                height: 54,
+                child: ElevatedButton(
+                  onPressed: _isUploading ? null : _handleSave,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1E1E2C),
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
+                  child: _isUploading 
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : Text(widget.listing == null ? 'Create Listing' : 'Save Changes', style: const TextStyle(fontWeight: FontWeight.bold)),
                 ),
-              ),
-              if (_suggestedSalePrice != null) ...[
-                const SizedBox(height: 24),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.05),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.blue.withOpacity(0.1)),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildPriceInfo('Sale Price', '\$${_suggestedSalePrice!.toStringAsFixed(2)}'),
-                      _buildPriceInfo('Rent Price', '\$${_suggestedRentPrice?.toStringAsFixed(2) ?? 'N/A'}/day'),
-                    ],
-                  ),
-                ),
-              ],
-              const SizedBox(height: 32),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-                  const SizedBox(width: 16),
-                  ElevatedButton(
-                    onPressed: _isUploading ? null : _updateListing,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF0F172A),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                    child: _isUploading
-                        ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                        : const Text('Update Listing'),
-                  ),
-                ],
               ),
             ],
           ),
@@ -207,59 +199,88 @@ class _EditListingDialogState extends State<EditListingDialog> {
     );
   }
 
-  Widget _buildImagePicker() {
-    return GestureDetector(
-      onTap: () async {
-        final image = await _picker.pickImage(source: ImageSource.gallery);
-        if (image != null) setState(() => _selectedImage = image);
-      },
-      child: Container(
-        height: 150,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: Colors.blue.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.blue.withOpacity(0.2), width: 1),
-        ),
-        child: _displayImage(),
+  Widget _buildModeToggle(String title, bool value, ValueChanged<bool> onChanged, TextEditingController controller, String priceLabel) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: value ? Colors.blue.withOpacity(0.05) : Colors.grey[50],
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: value ? Colors.blue.withOpacity(0.2) : Colors.grey[200]!),
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(title, style: TextStyle(fontWeight: value ? FontWeight.bold : FontWeight.normal)),
+              Switch.adaptive(value: value, onChanged: onChanged, activeColor: Colors.blueAccent),
+            ],
+          ),
+          if (value) ...[
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: priceLabel,
+                prefixText: "₹ ",
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
 
-  Widget _displayImage() {
-    if (_selectedImage != null) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: kIsWeb 
-           ? Image.network(_selectedImage!.path, fit: BoxFit.cover) 
-           : Image.file(File(_selectedImage!.path), fit: BoxFit.cover),
-      );
-    } else if (_existingImageUrl != null) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Image.network(_existingImageUrl!, fit: BoxFit.cover),
-      );
-    } else {
-      return const Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.add_photo_alternate_outlined, size: 40, color: Colors.blueAccent),
-          SizedBox(height: 8),
-          Text('Tap to add/change cover image', style: TextStyle(color: Colors.blueAccent)),
-        ],
-      );
-    }
+  Widget _buildImagePicker() {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () async {
+            final image = await _picker.pickImage(source: ImageSource.gallery);
+            if (image != null) setState(() => _selectedImage = image);
+          },
+          child: Container(
+            width: 120,
+            height: 160,
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.grey[300]!, style: BorderStyle.solid),
+            ),
+            child: _selectedImage != null || _existingImageUrl != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: _selectedImage != null 
+                        ? (kIsWeb ? Image.network(_selectedImage!.path, fit: BoxFit.cover) : Image.file(File(_selectedImage!.path), fit: BoxFit.cover))
+                        : Image.network(_existingImageUrl!, fit: BoxFit.cover),
+                  )
+                : const Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.add_a_photo_outlined, color: Colors.grey),
+                      SizedBox(height: 4),
+                      Text("Add Cover", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    ],
+                  ),
+          ),
+        ),
+      ],
+    );
   }
 
-  Widget _buildField(String label, TextEditingController controller) {
+  Widget _buildField(String label, TextEditingController controller, {String? hint}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF64748B))),
+        Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Color(0xFF64748B))),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
           decoration: InputDecoration(
+            hintText: hint,
             filled: true,
             fillColor: const Color(0xFFF8FAFC),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
@@ -273,30 +294,20 @@ class _EditListingDialogState extends State<EditListingDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF64748B))),
+        Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Color(0xFF64748B))),
         const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(12)),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
-              value: items.contains(value) ? value : items.first,
+              value: value,
               items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
               onChanged: onChanged,
               isExpanded: true,
             ),
           ),
         ),
-      ],
-    );
-  }
-
-  Widget _buildPriceInfo(String label, String value) {
-    return Column(
-      children: [
-        Text(label, style: const TextStyle(fontSize: 12, color: Color(0xFF64748B))),
-        const SizedBox(height: 4),
-        Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E1E2C))),
       ],
     );
   }

@@ -24,14 +24,44 @@ class ListingsBloc extends Bloc<ListingsEvent, ListingsState> {
       }
     });
 
+    on<FetchProximityListings>((event, emit) async {
+      emit(ListingsLoading());
+      try {
+        final result = await _repository.getListingsNearLocation(
+          latitude: event.latitude,
+          longitude: event.longitude,
+          limit: 10,
+        );
+        emit(ListingsLoaded(
+          listings: result.listings,
+          hasReachedMax: !result.hasMore,
+          lastCursor: result.lastCursor,
+          userLat: event.latitude,
+          userLng: event.longitude,
+        ));
+      } catch (e) {
+        emit(ListingsError(e.toString()));
+      }
+    });
+
     on<LoadMoreListings>((event, emit) async {
       final currentState = state;
       if (currentState is ListingsLoaded && !currentState.hasReachedMax) {
         try {
-          final result = await _repository.getListings(
-            limit: 10,
-            lastCursor: currentState.lastCursor,
-          );
+          final PaginatedListings result;
+          if (currentState.userLat != null && currentState.userLng != null) {
+            result = await _repository.getListingsNearLocation(
+              latitude: currentState.userLat!,
+              longitude: currentState.userLng!,
+              limit: 10,
+              lastCursor: currentState.lastCursor,
+            );
+          } else {
+            result = await _repository.getListings(
+              limit: 10,
+              lastCursor: currentState.lastCursor,
+            );
+          }
           
           emit(result.listings.isEmpty
               ? currentState.copyWith(hasReachedMax: true)
@@ -39,6 +69,8 @@ class ListingsBloc extends Bloc<ListingsEvent, ListingsState> {
                   listings: currentState.listings + result.listings,
                   hasReachedMax: !result.hasMore,
                   lastCursor: result.lastCursor,
+                  userLat: currentState.userLat,
+                  userLng: currentState.userLng,
                 ));
         } catch (e) {
           emit(ListingsError(e.toString()));
@@ -77,6 +109,31 @@ class ListingsBloc extends Bloc<ListingsEvent, ListingsState> {
         ));
       } catch (e) {
         emit(ListingsError(e.toString()));
+      }
+    });
+
+    on<AddListing>((event, emit) {
+      final currentState = state;
+      if (currentState is ListingsLoaded) {
+        emit(ListingsLoaded(
+          listings: [event.listing, ...currentState.listings],
+          hasReachedMax: currentState.hasReachedMax,
+          lastCursor: currentState.lastCursor,
+        ));
+      } else {
+        emit(ListingsLoaded(listings: [event.listing], hasReachedMax: true));
+      }
+    });
+
+    on<RemoveListing>((event, emit) {
+      final currentState = state;
+      if (currentState is ListingsLoaded) {
+        final newListings = currentState.listings.where((l) => l.id != event.id).toList();
+        emit(ListingsLoaded(
+          listings: newListings,
+          hasReachedMax: currentState.hasReachedMax,
+          lastCursor: currentState.lastCursor,
+        ));
       }
     });
   }

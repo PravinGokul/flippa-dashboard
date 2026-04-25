@@ -1,73 +1,170 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flippa/features/marketplace/listings/listings_bloc.dart';
+import 'package:flippa/features/marketplace/listings/listings_state.dart';
+import 'package:flippa/features/marketplace/listings/listings_event.dart';
 import 'package:flippa/data/models/listing_model.dart';
-import 'package:flippa/data/repositories/listings_repository.dart';
-import 'package:flippa/ui/widgets/glass/glass_card.dart';
+import 'package:flippa/ui/widgets/glass/glass_container.dart';
 import 'package:flippa/features/marketplace/listings/edit_listing_dialog.dart';
+import 'package:flippa/ui/widgets/shimmer_loader.dart';
 
-class SellingTab extends StatefulWidget {
+class SellingTab extends StatelessWidget {
   const SellingTab({super.key});
 
   @override
-  State<SellingTab> createState() => _SellingTabState();
-}
-
-class _SellingTabState extends State<SellingTab> {
-  final _repo = ListingsRepository();
-  late Future<List<ListingModel>> _listingsFuture;
-
-  @override
-  void initState() {
-    super.initState();
+  Widget build(BuildContext context) {
     final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
-    _listingsFuture = _repo.getListingsByOwner(uid);
+
+    return BlocBuilder<ListingsBloc, ListingsState>(
+      builder: (context, state) {
+        if (state is ListingsLoading) {
+          return ListView.builder(
+            padding: const EdgeInsets.all(24),
+            itemCount: 5,
+            itemBuilder: (_, __) => const InventorySkeleton(),
+          );
+        }
+        
+        List<ListingModel> myListings = [];
+        if (state is ListingsLoaded) {
+          myListings = state.listings.where((l) => l.ownerId == uid).toList();
+        }
+
+        return TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0.0, end: 1.0),
+          duration: const Duration(milliseconds: 600),
+          curve: Curves.easeOutCubic,
+          builder: (context, value, child) {
+            return Opacity(
+              opacity: value,
+              child: Transform.translate(
+                offset: Offset(0, 20 * (1 - value)),
+                child: child,
+              ),
+            );
+          },
+          child: Column(
+            children: [
+              _buildHeader(context),
+              Expanded(
+                child: myListings.isEmpty
+                    ? _buildEmptyState(context)
+                    : _buildInventoryList(context, myListings),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<List<ListingModel>>(
-      future: _listingsFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        }
-        final listings = snapshot.data ?? [];
-        if (listings.isEmpty) {
-          return _buildEmptyState(context);
-        }
-        return _buildInventoryList(listings);
-      },
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Your Inventory", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF1E1E2C))),
+              Text("Manage your listed books", style: TextStyle(fontSize: 13, color: Color(0xFF64748B))),
+            ],
+          ),
+          ElevatedButton.icon(
+            onPressed: () => _showAddListingDialog(context),
+            icon: const Icon(Icons.add, size: 18),
+            label: const Text("Add New"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1E1E2C),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildEmptyState(BuildContext context) {
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(40),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.library_books_outlined, size: 64, color: Colors.grey[300]),
+          const SizedBox(height: 16),
+          const Text("No books listed yet", style: TextStyle(color: Color(0xFF64748B), fontSize: 16)),
+          const SizedBox(height: 24),
+          TextButton(
+            onPressed: () => _showAddListingDialog(context),
+            child: const Text("List your first book"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInventoryList(BuildContext context, List<ListingModel> listings) {
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      itemCount: listings.length,
+      itemBuilder: (context, index) => _buildInventoryCard(context, listings[index]),
+    );
+  }
+
+  Widget _buildInventoryCard(BuildContext context, ListingModel listing) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: GlassContainer(
+        padding: const EdgeInsets.all(12),
+        child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.08),
-                shape: BoxShape.circle,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                listing.imageUrls?.isNotEmpty == true ? listing.imageUrls!.first : 'https://via.placeholder.com/60x80',
+                width: 60,
+                height: 80,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(color: Colors.grey[200], child: const Icon(Icons.book)),
               ),
-              child: const Icon(Icons.library_add_outlined, size: 52, color: Colors.blueAccent),
             ),
-            const SizedBox(height: 24),
-            const Text(
-              "No Books Listed Yet",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF1E1E2C)),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(listing.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  Text("by ${listing.author}", style: const TextStyle(color: Color(0xFF64748B), fontSize: 12)),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      _buildStatusBadge(listing.isAvailableForSale ? "For Sale" : "For Rent"),
+                      const SizedBox(width: 8),
+                      Text("₹${(listing.priceSale ?? listing.priceRentDaily ?? 0).toStringAsFixed(0)}", 
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 8),
-            const Text(
-              "Start selling by listing your first book from the marketplace.",
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey, fontSize: 14),
+            Column(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.edit_outlined, size: 20),
+                  onPressed: () => _showEditListingDialog(context, listing),
+                  constraints: const BoxConstraints(),
+                  padding: const EdgeInsets.all(8),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete_outline, size: 20, color: Colors.redAccent),
+                  onPressed: () => _confirmDelete(context, listing),
+                  constraints: const BoxConstraints(),
+                  padding: const EdgeInsets.all(8),
+                ),
+              ],
             ),
           ],
         ),
@@ -75,195 +172,58 @@ class _SellingTabState extends State<SellingTab> {
     );
   }
 
-  Widget _buildInventoryList(List<ListingModel> listings) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
-          child: Row(
-            children: [
-              Text(
-                "${listings.length} Active Listings",
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1E1E2C)),
-              ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.green.withOpacity(0.3)),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.circle, color: Colors.green, size: 8),
-                    SizedBox(width: 6),
-                    Text("Active", style: TextStyle(fontSize: 12, color: Colors.green, fontWeight: FontWeight.w600)),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: ListView.separated(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            itemCount: listings.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 10),
-            itemBuilder: (context, index) => _buildInventoryTile(context, listings[index]),
-          ),
-        ),
-      ],
+  Widget _buildStatusBadge(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.blue.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(text, style: const TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 10)),
     );
   }
 
-  Widget _buildInventoryTile(BuildContext context, ListingModel listing) {
-    final imageUrl = listing.imageUrls?.isNotEmpty == true ? listing.imageUrls!.first : null;
-    final price = listing.priceSale;
+  void _showAddListingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => EditListingDialog(
+        onSave: (listing) {
+          context.read<ListingsBloc>().add(AddListing(listing));
+        },
+      ),
+    );
+  }
 
-    return GlassCard(
-      padding: const EdgeInsets.all(12),
-      child: Row(
-        children: [
-          // Thumbnail
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: imageUrl != null
-                ? Image.network(imageUrl, width: 60, height: 75, fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => _placeholderThumbnail())
-                : _placeholderThumbnail(),
-          ),
-          const SizedBox(width: 14),
-          // Title & Meta
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  listing.title,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF1E1E2C)),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  "by ${listing.author}",
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    if (price != null)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF0FDF4),
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: const Color(0xFFBBF7D0)),
-                        ),
-                        child: Text(
-                          "₹${price.toStringAsFixed(0)}",
-                          style: const TextStyle(fontSize: 12, color: Colors.green, fontWeight: FontWeight.w700),
-                        ),
-                      ),
-                    if (listing.isAvailableForRent) ...[
-                      const SizedBox(width: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFEFF6FF),
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: const Color(0xFFBFDBFE)),
-                        ),
-                        child: const Text("Rent", style: TextStyle(fontSize: 11, color: Colors.blueAccent, fontWeight: FontWeight.w600)),
-                      ),
-                    ],
-                    if (listing.isAvailableForSale) ...[
-                      const SizedBox(width: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFF7ED),
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: const Color(0xFFFED7AA)),
-                        ),
-                        child: const Text("Sale", style: TextStyle(fontSize: 11, color: Colors.deepOrange, fontWeight: FontWeight.w600)),
-                      ),
-                    ],
-                  ],
-                ),
-              ],
-            ),
-          ),
-          // Quick Actions
-          Column(
-            children: [
-              _actionButton(Icons.edit_outlined, Colors.blueAccent, () async {
-                final didUpdate = await showDialog<bool>(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (ctx) => EditListingDialog(listing: listing),
-                );
-                
-                if (didUpdate == true) {
-                  setState(() {
-                    final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
-                    _listingsFuture = _repo.getListingsByOwner(uid);
-                  });
-                }
-              }),
-              const SizedBox(height: 8),
-              _actionButton(Icons.delete_outline, Colors.redAccent, () async {
-                final confirmed = await showDialog<bool>(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                    title: const Text("Delete Listing?"),
-                    content: Text("Are you sure you want to remove \"${listing.title}\"?"),
-                    actions: [
-                      TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text("Cancel")),
-                      TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text("Delete", style: TextStyle(color: Colors.red))),
-                    ],
-                  ),
-                );
-                if (confirmed == true) {
-                  await _repo.deleteListing(listing.id);
-                  setState(() {
-                    final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
-                    _listingsFuture = _repo.getListingsByOwner(uid);
-                  });
-                }
-              }),
-            ],
+  void _showEditListingDialog(BuildContext context, ListingModel listing) {
+    showDialog(
+      context: context,
+      builder: (ctx) => EditListingDialog(
+        listing: listing,
+        onSave: (updated) {
+          // In a real app we'd update in repo too
+          context.read<ListingsBloc>().add(RemoveListing(listing.id));
+          context.read<ListingsBloc>().add(AddListing(updated));
+        },
+      ),
+    );
+  }
+
+  void _confirmDelete(BuildContext context, ListingModel listing) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Delete Listing?"),
+        content: Text("Are you sure you want to remove '${listing.title}'?"),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Cancel")),
+          TextButton(
+            onPressed: () {
+              context.read<ListingsBloc>().add(RemoveListing(listing.id));
+              Navigator.pop(ctx);
+            },
+            child: const Text("Delete", style: TextStyle(color: Colors.redAccent)),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _placeholderThumbnail() {
-    return Container(
-      width: 60,
-      height: 75,
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: const Icon(Icons.menu_book_outlined, color: Colors.grey, size: 28),
-    );
-  }
-
-  Widget _actionButton(IconData icon, Color color, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(icon, size: 18, color: color),
       ),
     );
   }

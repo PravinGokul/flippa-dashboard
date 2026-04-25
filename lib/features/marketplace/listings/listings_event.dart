@@ -19,3 +19,19 @@ class SearchListings extends ListingsEvent {
 }
 
 class LoadMoreListings extends ListingsEvent {}
+
+class AddListing extends ListingsEvent {
+  final ListingModel listing;
+  AddListing(this.listing);
+}
+
+class RemoveListing extends ListingsEvent {
+  final String id;
+  RemoveListing(this.id);
+}
+
+class FetchProximityListings extends ListingsEvent {
+  final double latitude;
+  final double longitude;
+  FetchProximityListings(this.latitude, this.longitude);
+}

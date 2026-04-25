@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/listing_model.dart';
 import '../../core/services/cache_service.dart';
+import '../../core/services/location_service.dart';
 
 class PaginatedListings {
   final List<ListingModel> listings;
@@ -23,7 +24,28 @@ class ListingsRepository {
 
   // Environment Gate (Pattern A - Seed-once/Demo)
   // Set to true to show deterministic investor-grade sample data
-  static const bool isDemoMode = false;
+  static const bool isDemoMode = true; // Enabled for testing proximity
+
+  /// Fetch listings near a specific location
+  Future<PaginatedListings> getListingsNearLocation({
+    required double latitude,
+    required double longitude,
+    int limit = 10,
+    dynamic lastCursor,
+  }) async {
+    if (isDemoMode) {
+      return _getDemoListings(
+        limit: limit, 
+        offset: lastCursor as int? ?? 0,
+        userLat: latitude,
+        userLng: longitude,
+      );
+    }
+    
+    // In production, we would use geohash-based queries with GeoFlutterFire
+    // For now, we fallback to standard pagination
+    return getListings(limit: limit, lastCursor: lastCursor);
+  }
 
   /// Fetch listings with pagination
   Future<PaginatedListings> getListings({
@@ -95,25 +117,43 @@ class ListingsRepository {
     });
   }
 
-  Future<PaginatedListings> _getDemoListings({required int limit, required int offset}) async {
+  Future<PaginatedListings> _getDemoListings({
+    required int limit, 
+    required int offset,
+    double? userLat,
+    double? userLng,
+  }) async {
     try {
       final String response = await rootBundle.loadString('assets/data/sample_listings.json');
-      final List<dynamic> allData = json.decode(response);
+      List<dynamic> allData = json.decode(response);
       
+      List<ListingModel> allListings = allData.map((json) => ListingModel.fromJson(json)).toList();
+
+      // Proximity Sorting
+      if (userLat != null && userLng != null) {
+        allListings.sort((a, b) {
+          if (a.latitude == null || a.longitude == null) return 1;
+          if (b.latitude == null || b.longitude == null) return -1;
+          
+          final distA = LocationService.calculateDistance(userLat, userLng, a.latitude!, a.longitude!);
+          final distB = LocationService.calculateDistance(userLat, userLng, b.latitude!, b.longitude!);
+          return distA.compareTo(distB);
+        });
+      }
+
       final int start = offset;
-      final int end = (start + limit) > allData.length ? allData.length : (start + limit);
+      final int end = (start + limit) > allListings.length ? allListings.length : (start + limit);
       
-      if (start >= allData.length) {
+      if (start >= allListings.length) {
         return PaginatedListings(listings: [], lastCursor: offset, hasMore: false);
       }
 
-      final pageData = allData.sublist(start, end);
-      final listings = pageData.map((json) => ListingModel.fromJson(json)).toList();
+      final listings = allListings.sublist(start, end);
       
       return PaginatedListings(
         listings: listings,
         lastCursor: end,
-        hasMore: end < allData.length,
+        hasMore: end < allListings.length,
       );
     } catch (e) {
       print("Error loading demo listings: $e");

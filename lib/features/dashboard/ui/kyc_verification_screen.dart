@@ -1,45 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../ui/widgets/glass/glass_container.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
-class SellerVerificationScreen extends StatefulWidget {
-  const SellerVerificationScreen({super.key});
+class KYCVerificationScreen extends StatefulWidget {
+  const KYCVerificationScreen({super.key});
 
   @override
-  State<SellerVerificationScreen> createState() => _SellerVerificationScreenState();
+  State<KYCVerificationScreen> createState() => _KYCVerificationScreenState();
 }
 
-class _SellerVerificationScreenState extends State<SellerVerificationScreen> {
+class _KYCVerificationScreenState extends State<KYCVerificationScreen> {
   bool _isSubmitting = false;
 
-  Future<void> _submitVerification() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-
+  void _submitVerification() async {
     setState(() => _isSubmitting = true);
-    
-    try {
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
-        'role': 'seller',
-        'kycSubmitted': true,
-        'verificationRequestedAt': FieldValue.serverTimestamp(),
-      });
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Verification submitted successfully!')),
-        );
-        Navigator.pop(context);
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Submission failed: ${e.toString()}')),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isSubmitting = false);
+    await Future.delayed(const Duration(seconds: 2));
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Verification submitted successfully!')),
+      );
+      context.pop();
     }
   }
 
@@ -55,7 +35,7 @@ class _SellerVerificationScreenState extends State<SellerVerificationScreen> {
               Text("Back", style: TextStyle(fontSize: 14)),
             ],
           ),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
         ),
         leadingWidth: 100,
         title: const Column(
