@@ -73,8 +73,10 @@ class ProfileTab extends StatelessWidget {
                             Expanded(
                               flex: 2,
                               child: SingleChildScrollView(
-                                child: Column(
-                                  children: _buildMenuItemsList(context),
+                                child: Wrap(
+                                  spacing: 24,
+                                  runSpacing: 24,
+                                  children: _buildDesktopMenuItemsList(context).map((c) => SizedBox(width: 200, child: c)).toList(),
                                 ),
                               ),
                             ),
@@ -161,6 +163,45 @@ class ProfileTab extends StatelessWidget {
         Text(name, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
         Text(username, style: const TextStyle(fontSize: 14, color: Color(0xFF94A3B8))),
       ],
+    );
+  }
+
+  List<Widget> _buildDesktopMenuItemsList(BuildContext context) {
+    return [
+      _buildDesktopMenuItem(Icons.home_outlined, "My Listings", () => context.push('/my-listings')),
+      _buildDesktopMenuItem(Icons.favorite_outline_rounded, "Saved Items", () {}),
+      _buildDesktopMenuItem(Icons.list_alt_rounded, "Transactions", () {}),
+      _buildDesktopMenuItem(Icons.chat_bubble_outline_rounded, "Messages", () {}),
+      _buildDesktopMenuItem(Icons.insights_rounded, "Performance Stats", () {}),
+      _buildDesktopMenuItem(Icons.settings_outlined, "Settings", () => context.push('/settings')),
+      _buildDesktopMenuItem(Icons.help_outline_rounded, "Help Center", () {}),
+      _buildDesktopMenuItem(Icons.logout_rounded, "Sign Out", () => FirebaseAuth.instance.signOut(), color: Colors.redAccent),
+    ];
+  }
+
+  Widget _buildDesktopMenuItem(IconData icon, String title, VoidCallback onTap, {Color color = Colors.white}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(24),
+      child: GlassContainer(
+        padding: const EdgeInsets.all(24),
+        background: Colors.white.withOpacity(0.05),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: color, size: 32),
+            ),
+            const SizedBox(height: 16),
+            Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: color)),
+          ],
+        ),
+      ),
     );
   }
 
