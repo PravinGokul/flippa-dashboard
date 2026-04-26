@@ -48,113 +48,137 @@ class ProfileTab extends StatelessWidget {
           ),
           
           SafeArea(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 800),
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                children: [
-                  // App Bar Style Header
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildHeaderButton(Icons.chevron_left, () => context.pop()),
-                      const Text(
-                        "My Flippa",
-                        style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      _buildHeaderButton(Icons.notifications_outlined, () {}),
-                    ],
-                  ),
-                  const SizedBox(height: 40),
-
-                  // Avatar & Info
-                  Stack(
-                    alignment: Alignment.bottomCenter,
-                    children: [
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF334155), Color(0xFF1E293B)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
-                              blurRadius: 20,
-                              offset: const Offset(0, 10),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isDesktop = constraints.maxWidth > 900;
+                
+                if (isDesktop) {
+                  return Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 1200),
+                      child: Padding(
+                        padding: const EdgeInsets.all(40),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: GlassContainer(
+                                padding: const EdgeInsets.all(32),
+                                background: Colors.white.withOpacity(0.02),
+                                child: _buildAvatarInfo(initials, name, username),
+                              ),
+                            ),
+                            const SizedBox(width: 40),
+                            Expanded(
+                              flex: 2,
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  children: _buildMenuItemsList(context),
+                                ),
+                              ),
                             ),
                           ],
                         ),
-                        child: Center(
-                          child: Text(
-                            initials,
-                            style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
-                          ),
-                        ),
                       ),
-                      Transform.translate(
-                        offset: const Offset(0, 10),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.amber,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xFF0F172A), width: 2),
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.check_circle, size: 12, color: Color(0xFF0F172A)),
-                              SizedBox(width: 4),
-                              Text(
-                                "Verified Seller",
-                                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)),
-                              ),
-                            ],
-                          ),
-                        ),
+                    ),
+                  );
+                }
+
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildHeaderButton(Icons.chevron_left, () => context.pop()),
+                          const Text("My Flippa", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                          _buildHeaderButton(Icons.notifications_outlined, () {}),
+                        ],
                       ),
+                      const SizedBox(height: 40),
+                      _buildAvatarInfo(initials, name, username),
+                      const SizedBox(height: 40),
+                      ..._buildMenuItemsList(context),
                     ],
                   ),
-                  const SizedBox(height: 24),
-                  Text(
-                    name,
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
-                  ),
-                  Text(
-                    username,
-                    style: const TextStyle(fontSize: 14, color: Color(0xFF94A3B8)),
-                  ),
-                  const SizedBox(height: 40),
-
-                  // Menu Items
-                  _buildMenuItem(Icons.home_outlined, "My Listings", () => context.push('/my-listings')),
-                  _buildMenuItem(Icons.favorite_outline_rounded, "Saved Items", () {}),
-                  _buildMenuItem(Icons.list_alt_rounded, "Transactions", () {}),
-                  _buildMenuItem(Icons.chat_bubble_outline_rounded, "Messages", () {}),
-                  _buildMenuItem(Icons.insights_rounded, "Performance Stats", () {}),
-                  _buildMenuItem(Icons.settings_outlined, "Settings", () => context.push('/settings')),
-                  _buildMenuItem(Icons.help_outline_rounded, "Help Center", () {}),
-
-                  const SizedBox(height: 32),
-                  _buildSignOutButton(context),
-                  const SizedBox(height: 40),
-                ],
-              ),
+                );
+              },
             ),
-          ),
-          ),
           ),
         ],
       ),
     );
   }
+
+  Widget _buildAvatarInfo(String initials, String name, String username) {
+    return Column(
+      children: [
+        Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF334155), Color(0xFF1E293B)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10)),
+                ],
+              ),
+              child: Center(
+                child: Text(initials, style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white)),
+              ),
+            ),
+            Transform.translate(
+              offset: const Offset(0, 10),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.amber,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFF0F172A), width: 2),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.check_circle, size: 12, color: Color(0xFF0F172A)),
+                    SizedBox(width: 4),
+                    Text("Verified Seller", style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: Color(0xFF0F172A))),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+        Text(name, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+        Text(username, style: const TextStyle(fontSize: 14, color: Color(0xFF94A3B8))),
+      ],
+    );
+  }
+
+  List<Widget> _buildMenuItemsList(BuildContext context) {
+    return [
+      _buildMenuItem(Icons.home_outlined, "My Listings", () => context.push('/my-listings')),
+      _buildMenuItem(Icons.favorite_outline_rounded, "Saved Items", () {}),
+      _buildMenuItem(Icons.list_alt_rounded, "Transactions", () {}),
+      _buildMenuItem(Icons.chat_bubble_outline_rounded, "Messages", () {}),
+      _buildMenuItem(Icons.insights_rounded, "Performance Stats", () {}),
+      _buildMenuItem(Icons.settings_outlined, "Settings", () => context.push('/settings')),
+      _buildMenuItem(Icons.help_outline_rounded, "Help Center", () {}),
+      const SizedBox(height: 32),
+      _buildSignOutButton(context),
+      const SizedBox(height: 40),
+    ];
+  }
+
 
   Widget _buildHeaderButton(IconData icon, VoidCallback onTap) {
     return InkWell(

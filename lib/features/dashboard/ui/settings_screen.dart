@@ -39,29 +39,80 @@ class SettingsScreen extends StatelessWidget {
           child: Container(color: Colors.grey[100], height: 1),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-        children: [
-          _buildSectionHeader("Account"),
-          _buildTile(Icons.person, "Edit Profile", "Name, Email, Phone", const Color(0xFF7C3AED), () => context.push('/settings/profile')),
-          _buildTile(Icons.lock_person, "Security", "Password, Two-factor auth", Colors.amber, () => context.push('/settings/security')),
-          _buildTile(Icons.payment, "Payment Methods", "Cards, UPI, Bank accounts", Colors.blue, () => context.push('/settings/payment')),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isDesktop = constraints.maxWidth > 900;
           
-          const SizedBox(height: 32),
-          _buildSectionHeader("Preferences"),
-          _buildLanguageTile(context),
-          _buildCurrencyTile(context),
-          _buildTile(Icons.notifications, "Notifications", "Push, Email, SMS", Colors.orange, () => context.push('/settings/notifications')),
-          
-          const SizedBox(height: 32),
-          _buildSectionHeader("Support & About"),
-          _buildTile(Icons.help_center, "Help Center", "FAQs, Contact support", Colors.redAccent, () => context.push('/settings/help')),
-          _buildTile(Icons.privacy_tip, "Privacy Policy", "Data usage and protection", Colors.blueAccent, () => context.push('/settings/privacy')),
-          
-          const SizedBox(height: 48),
-          _buildSignOutButton(context),
-          const SizedBox(height: 40),
-        ],
+          if (isDesktop) {
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1200),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 40),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildSectionHeader("Account"),
+                            _buildTile(Icons.person, "Edit Profile", "Name, Email, Phone", const Color(0xFF7C3AED), () => context.push('/settings/profile')),
+                            _buildTile(Icons.lock_person, "Security", "Password, Two-factor auth", Colors.amber, () => context.push('/settings/security')),
+                            _buildTile(Icons.payment, "Payment Methods", "Cards, UPI, Bank accounts", Colors.blue, () => context.push('/settings/payment')),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 40),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildSectionHeader("Preferences"),
+                            _buildLanguageTile(context),
+                            _buildCurrencyTile(context),
+                            _buildTile(Icons.notifications, "Notifications", "Push, Email, SMS", Colors.orange, () => context.push('/settings/notifications')),
+                            const SizedBox(height: 32),
+                            _buildSectionHeader("Support & About"),
+                            _buildTile(Icons.help_center, "Help Center", "FAQs, Contact support", Colors.redAccent, () => context.push('/settings/help')),
+                            _buildTile(Icons.privacy_tip, "Privacy Policy", "Data usage and protection", Colors.blueAccent, () => context.push('/settings/privacy')),
+                            const SizedBox(height: 48),
+                            _buildSignOutButton(context),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+
+          return ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            children: [
+              _buildSectionHeader("Account"),
+              _buildTile(Icons.person, "Edit Profile", "Name, Email, Phone", const Color(0xFF7C3AED), () => context.push('/settings/profile')),
+              _buildTile(Icons.lock_person, "Security", "Password, Two-factor auth", Colors.amber, () => context.push('/settings/security')),
+              _buildTile(Icons.payment, "Payment Methods", "Cards, UPI, Bank accounts", Colors.blue, () => context.push('/settings/payment')),
+              
+              const SizedBox(height: 32),
+              _buildSectionHeader("Preferences"),
+              _buildLanguageTile(context),
+              _buildCurrencyTile(context),
+              _buildTile(Icons.notifications, "Notifications", "Push, Email, SMS", Colors.orange, () => context.push('/settings/notifications')),
+              
+              const SizedBox(height: 32),
+              _buildSectionHeader("Support & About"),
+              _buildTile(Icons.help_center, "Help Center", "FAQs, Contact support", Colors.redAccent, () => context.push('/settings/help')),
+              _buildTile(Icons.privacy_tip, "Privacy Policy", "Data usage and protection", Colors.blueAccent, () => context.push('/settings/privacy')),
+              
+              const SizedBox(height: 48),
+              _buildSignOutButton(context),
+              const SizedBox(height: 40),
+            ],
+          );
+        },
       ),
     );
   }

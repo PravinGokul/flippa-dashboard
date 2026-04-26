@@ -24,14 +24,7 @@ class MainShell extends StatelessWidget {
         
         return Scaffold(
           appBar: isDesktop ? _buildDesktopHeader(context, getIndex()) : null,
-          body: isDesktop 
-              ? Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 1200),
-                    child: child,
-                  ),
-                )
-              : child,
+          body: child,
           bottomNavigationBar: isDesktop ? null : _buildMobileBottomNav(context, getIndex()),
         );
       },
@@ -43,8 +36,8 @@ class MainShell extends StatelessWidget {
       backgroundColor: Colors.white,
       elevation: 0,
       centerTitle: true,
-      title: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1200),
+      title: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Row(
           children: [
             const Text("Flippa", style: TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.bold, fontSize: 24)),

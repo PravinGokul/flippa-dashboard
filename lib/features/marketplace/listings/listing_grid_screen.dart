@@ -45,8 +45,10 @@ class _ListingGridScreenState extends State<ListingGridScreen> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             final isDesktop = constraints.maxWidth > 900;
-            final isTablet = constraints.maxWidth > 600 && !isDesktop;
-            final crossAxisCount = isDesktop ? 4 : (isTablet ? 3 : 2);
+            // Calculate crossAxisCount dynamically: roughly 1 column per 250px on desktop
+            final crossAxisCount = isDesktop 
+                ? (constraints.maxWidth ~/ 250).clamp(2, 10) 
+                : (constraints.maxWidth > 600 ? 3 : 2);
             
             return Column(
               children: [
