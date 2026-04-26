@@ -11,19 +11,24 @@ class SummaryTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(),
-          const SizedBox(height: 32),
-          _buildStatsGrid(),
-          const SizedBox(height: 32),
-          _buildRevenueSection(),
-          const SizedBox(height: 32),
-          _buildRecentActivity(),
-          const SizedBox(height: 40),
-        ],
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1400),
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(),
+                const SizedBox(height: 32),
+                _buildStatsGrid(),
+                const SizedBox(height: 32),
+                _buildMainContent(),
+                const SizedBox(height: 40),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -78,7 +83,7 @@ class SummaryTab extends StatelessWidget {
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth > 900;
         final isTablet = constraints.maxWidth > 600 && !isDesktop;
-        final count = isDesktop ? (constraints.maxWidth ~/ 250).clamp(2, 8) : (isTablet ? 3 : 2);
+        final count = isDesktop ? 4 : (isTablet ? 3 : 2);
         
         return GridView.count(
           crossAxisCount: count,
@@ -125,7 +130,7 @@ class SummaryTab extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      Icon(
+                       Icon(
                         trend.startsWith('+') ? Icons.arrow_upward : Icons.arrow_downward,
                         size: 10,
                         color: trend.startsWith('+') ? Colors.green : Colors.red,
@@ -164,6 +169,31 @@ class SummaryTab extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildMainContent() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isDesktop = constraints.maxWidth > 900;
+        if (isDesktop) {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(flex: 2, child: _buildRevenueSection()),
+              const SizedBox(width: 24),
+              Expanded(flex: 1, child: _buildRecentActivity()),
+            ],
+          );
+        }
+        return Column(
+          children: [
+            _buildRevenueSection(),
+            const SizedBox(height: 32),
+            _buildRecentActivity(),
+          ],
+        );
+      },
     );
   }
 
