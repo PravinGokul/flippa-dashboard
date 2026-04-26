@@ -13,51 +13,17 @@ class ProfileTab extends StatelessWidget {
     final username = "@${name.toLowerCase().replaceAll(' ', '_')}";
     final initials = name.split(' ').map((e) => e[0]).take(2).join().toUpperCase();
 
-    return Container(
-      width: double.infinity,
-      height: double.infinity,
-      decoration: const BoxDecoration(
-        color: Color(0xFF0F172A), // Dark background matching mockup 3
-      ),
-      child: Stack(
-        children: [
-          // Background Glows
-          Positioned(
-            top: -100,
-            right: -50,
-            child: Container(
-              width: 300,
-              height: 300,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.blue.withOpacity(0.15),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 100,
-            left: -50,
-            child: Container(
-              width: 250,
-              height: 250,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.purple.withOpacity(0.1),
-              ),
-            ),
-          ),
+    return SafeArea(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isDesktop = constraints.maxWidth > 900;
           
-          SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final isDesktop = constraints.maxWidth > 900;
-                
-                if (isDesktop) {
-                  return Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 1200),
-                      child: Padding(
-                        padding: const EdgeInsets.all(40),
+          if (isDesktop) {
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1200),
+                child: Padding(
+                  padding: const EdgeInsets.all(40),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -95,7 +61,7 @@ class ProfileTab extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           _buildHeaderButton(Icons.chevron_left, () => context.pop()),
-                          const Text("My Flippa", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                          const Text("My Flippa", style: TextStyle(color: Color(0xFF1E293B), fontSize: 18, fontWeight: FontWeight.bold)),
                           _buildHeaderButton(Icons.notifications_outlined, () {}),
                         ],
                       ),
@@ -108,9 +74,6 @@ class ProfileTab extends StatelessWidget {
                 );
               },
             ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -131,7 +94,7 @@ class ProfileTab extends StatelessWidget {
                 ),
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10)),
+                  BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20, offset: const Offset(0, 10)),
                 ],
               ),
               child: Center(
@@ -160,8 +123,8 @@ class ProfileTab extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 24),
-        Text(name, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
-        Text(username, style: const TextStyle(fontSize: 14, color: Color(0xFF94A3B8))),
+        Text(name, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+        Text(username, style: const TextStyle(fontSize: 14, color: Color(0xFF64748B))),
       ],
     );
   }
@@ -179,13 +142,13 @@ class ProfileTab extends StatelessWidget {
     ];
   }
 
-  Widget _buildDesktopMenuItem(IconData icon, String title, VoidCallback onTap, {Color color = Colors.white}) {
+  Widget _buildDesktopMenuItem(IconData icon, String title, VoidCallback onTap, {Color color = const Color(0xFF1E293B)}) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(24),
       child: GlassContainer(
         padding: const EdgeInsets.all(24),
-        background: Colors.white.withOpacity(0.05),
+        background: Colors.white.withOpacity(0.4),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -227,10 +190,10 @@ class ProfileTab extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.05),
+          color: Colors.white.withOpacity(0.5),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: Colors.white, size: 20),
+        child: Icon(icon, color: const Color(0xFF1E293B), size: 20),
       ),
     );
   }
@@ -243,17 +206,17 @@ class ProfileTab extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         child: GlassContainer(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          background: Colors.white.withOpacity(0.05),
+          background: Colors.white.withOpacity(0.4),
           child: Row(
             children: [
-              Icon(icon, color: Colors.white70, size: 20),
+              Icon(icon, color: const Color(0xFF64748B), size: 20),
               const SizedBox(width: 16),
               Text(
                 title,
-                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white),
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Color(0xFF1E293B)),
               ),
               const Spacer(),
-              const Icon(Icons.chevron_right, color: Colors.white24, size: 20),
+              const Icon(Icons.chevron_right, color: Color(0xFF94A3B8), size: 20),
             ],
           ),
         ),
