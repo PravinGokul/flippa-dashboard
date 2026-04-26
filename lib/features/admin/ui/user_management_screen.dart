@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../ui/widgets/glass/glass_container.dart';
+import 'package:flippa/ui/widgets/glass/glass_container.dart';
 
 class UserManagementScreen extends StatefulWidget {
   const UserManagementScreen({super.key});
@@ -38,13 +38,27 @@ class _UserManagementScreenState extends State<UserManagementScreen> with Single
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
       appBar: AppBar(
+        leadingWidth: 100,
+        leading: InkWell(
+          onTap: () => context.pop(),
+          child: const Padding(
+            padding: EdgeInsets.only(left: 16),
+            child: Row(
+              children: [
+                Icon(Icons.chevron_left, color: Color(0xFF64748B)),
+                Text("Back", style: TextStyle(color: Color(0xFF64748B), fontWeight: FontWeight.bold, fontSize: 16)),
+              ],
+            ),
+          ),
+        ),
+        title: const Text(
+          "User Management",
+          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 28, color: Color(0xFF1E293B)),
+        ),
+        centerTitle: false,
+        toolbarHeight: 120,
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF1E1E2C)),
-          onPressed: () => context.pop(),
-        ),
-        title: const Text("User Management", style: TextStyle(color: Color(0xFF1E1E2C), fontWeight: FontWeight.bold)),
       ),
       body: Column(
         children: [

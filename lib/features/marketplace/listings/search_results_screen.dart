@@ -1,9 +1,13 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flippa/features/marketplace/listings/listings_bloc.dart';
 import 'package:flippa/features/marketplace/listings/listings_state.dart';
 import 'package:flippa/features/marketplace/listings/listings_event.dart';
 import 'package:flippa/ui/widgets/empty_state.dart';
 import 'package:flippa/ui/widgets/shimmer_loader.dart';
+import 'package:flippa/features/marketplace/listings/listing_card.dart';
+import 'package:flippa/ui/widgets/glass/glass_container.dart';
 
 class SearchResultsScreen extends StatefulWidget {
   final String query;

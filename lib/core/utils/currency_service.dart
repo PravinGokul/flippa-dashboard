@@ -18,8 +18,8 @@ class CurrencyService {
     switch (code) {
       case 'INR': return '₹';
       case 'EUR': return '€';
-      case 'USD': return '$';
-      default: return '$';
+      case 'USD': return '\$';
+      default: return '\$';
     }
   }
 }

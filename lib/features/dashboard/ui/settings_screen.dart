@@ -13,83 +13,99 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
       appBar: AppBar(
+        leadingWidth: 100,
+        leading: InkWell(
+          onTap: () => context.pop(),
+          child: const Padding(
+            padding: EdgeInsets.only(left: 16),
+            child: Row(
+              children: [
+                Icon(Icons.chevron_left, color: Color(0xFF64748B)),
+                Text("Back", style: TextStyle(color: Color(0xFF64748B), fontWeight: FontWeight.bold, fontSize: 16)),
+              ],
+            ),
+          ),
+        ),
+        title: const Text(
+          "Settings",
+          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 28, color: Color(0xFF1E293B)),
+        ),
+        centerTitle: false,
+        toolbarHeight: 120,
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF1E1E2C)),
-          onPressed: () => context.pop(),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(color: Colors.grey[100], height: 1),
         ),
-        title: const Text("Settings", style: TextStyle(color: Color(0xFF1E1E2C), fontWeight: FontWeight.bold)),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
         children: [
-          _buildSectionTitle("Account"),
-          _buildSettingsTile(Icons.person_outline, "Edit Profile", "Name, Email, Phone", () {}),
-          _buildSettingsTile(Icons.lock_outline, "Security", "Password, Two-factor auth", () {}),
-          _buildSettingsTile(Icons.payment_outlined, "Payment Methods", "Cards, UPI, Bank accounts", () {}),
+          _buildSectionHeader("Account"),
+          _buildTile(Icons.person, "Edit Profile", "Name, Email, Phone", const Color(0xFF7C3AED), () => context.push('/settings/profile')),
+          _buildTile(Icons.lock_person, "Security", "Password, Two-factor auth", Colors.amber, () => context.push('/settings/security')),
+          _buildTile(Icons.payment, "Payment Methods", "Cards, UPI, Bank accounts", Colors.blue, () => context.push('/settings/payment')),
           
           const SizedBox(height: 32),
-          _buildSectionTitle("Preferences"),
+          _buildSectionHeader("Preferences"),
           _buildLanguageTile(context),
           _buildCurrencyTile(context),
-          _buildSettingsTile(Icons.notifications_none, "Notifications", "Push, Email, SMS", () {}),
+          _buildTile(Icons.notifications, "Notifications", "Push, Email, SMS", Colors.orange, () => context.push('/settings/notifications')),
           
           const SizedBox(height: 32),
-          _buildSectionTitle("Support & About"),
-          _buildSettingsTile(Icons.help_outline, "Help Center", "FAQs, Contact support", () {}),
-          _buildSettingsTile(Icons.privacy_tip_outline, "Privacy Policy", "Data usage and protection", () {}),
-          _buildSettingsTile(Icons.info_outline, "Terms of Service", "App rules and regulations", () {}),
+          _buildSectionHeader("Support & About"),
+          _buildTile(Icons.help_center, "Help Center", "FAQs, Contact support", Colors.redAccent, () => context.push('/settings/help')),
+          _buildTile(Icons.privacy_tip, "Privacy Policy", "Data usage and protection", Colors.blueAccent, () => context.push('/settings/privacy')),
           
           const SizedBox(height: 48),
           _buildSignOutButton(context),
           const SizedBox(height: 40),
-          const Center(
-            child: Text(
-              "Flippa v1.0.4 - Built with ❤️ in India",
-              style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12),
-            ),
-          ),
         ],
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionHeader(String title) {
     return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 12),
+      padding: const EdgeInsets.only(left: 4, bottom: 16),
       child: Text(
         title.toUpperCase(),
-        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8), letterSpacing: 1.2),
+        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Color(0xFF94A3B8), letterSpacing: 1.5),
       ),
     );
   }
 
-  Widget _buildSettingsTile(IconData icon, String title, String subtitle, VoidCallback onTap) {
+  Widget _buildTile(IconData icon, String title, String subtitle, Color color, VoidCallback onTap) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: InkWell(
         onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
         child: GlassContainer(
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(10)),
-                child: Icon(icon, color: const Color(0xFF1E293B), size: 20),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: color.withOpacity(0.8), size: 22),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                    Text(subtitle, style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+                    Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF1E293B))),
+                    const SizedBox(height: 2),
+                    Text(subtitle, style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8))),
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right, color: Color(0xFF94A3B8), size: 20),
+              const Icon(Icons.chevron_right, color: Color(0xFFE2E8F0), size: 20),
             ],
           ),
         ),
@@ -100,13 +116,12 @@ class SettingsScreen extends StatelessWidget {
   Widget _buildLanguageTile(BuildContext context) {
     return BlocBuilder<GlobalBloc, GlobalState>(
       builder: (context, state) {
-        return _buildSettingsTile(
-          Icons.language_outlined,
+        return _buildTile(
+          Icons.language,
           "Language",
           state.locale.languageCode == 'en' ? "English" : "Hindi (हिंदी)",
-          () {
-            // Show language picker
-          },
+          Colors.cyan,
+          () {},
         );
       },
     );
@@ -115,38 +130,27 @@ class SettingsScreen extends StatelessWidget {
   Widget _buildCurrencyTile(BuildContext context) {
     return BlocBuilder<GlobalBloc, GlobalState>(
       builder: (context, state) {
-        return _buildSettingsTile(
-          Icons.payments_outlined,
+        return _buildTile(
+          Icons.currency_exchange,
           "Currency",
           state.currency,
-          () {
-            // Show currency picker
-          },
+          Colors.indigo,
+          () {},
         );
       },
     );
   }
 
   Widget _buildSignOutButton(BuildContext context) {
-    return InkWell(
-      onTap: () async {
-        await context.read<AuthService>().signOut();
-        if (context.mounted) context.go('/login');
-      },
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.redAccent.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.redAccent.withOpacity(0.1)),
-        ),
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.logout_rounded, color: Colors.redAccent, size: 20),
-            SizedBox(width: 12),
-            Text("Sign Out", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 16)),
-          ],
+    return Center(
+      child: TextButton(
+        onPressed: () async {
+          await context.read<AuthService>().signOut();
+          if (context.mounted) context.go('/login');
+        },
+        child: const Text(
+          "Sign Out",
+          style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 16),
         ),
       ),
     );

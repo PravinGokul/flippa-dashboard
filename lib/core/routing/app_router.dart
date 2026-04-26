@@ -17,6 +17,12 @@ import '../../features/marketplace/listings/auction_listing_screen.dart';
 import '../../features/notifications/ui/notifications_screen.dart';
 import '../../features/dashboard/ui/my_flippa_screen.dart';
 import '../../features/dashboard/ui/settings_screen.dart';
+import '../../features/dashboard/ui/settings/edit_profile_screen.dart';
+import '../../features/dashboard/ui/settings/security_screen.dart';
+import '../../features/dashboard/ui/settings/payment_methods_screen.dart';
+import '../../features/dashboard/ui/settings/notifications_settings_screen.dart';
+import '../../features/dashboard/ui/settings/help_center_screen.dart';
+import '../../features/dashboard/ui/settings/privacy_policy_screen.dart';
 import '../../features/dashboard/ui/kyc_verification_screen.dart';
 import '../../features/admin/ui/user_management_screen.dart';
 import '../../features/admin/ui/admin_dispute_screen.dart';
@@ -178,6 +184,50 @@ class AppRouter {
           key: state.pageKey,
           child: const SettingsScreen(),
         ),
+        routes: [
+          GoRoute(
+            path: 'profile',
+            pageBuilder: (context, state) => customTransitionPage(
+              key: state.pageKey,
+              child: const EditProfileScreen(),
+            ),
+          ),
+          GoRoute(
+            path: 'security',
+            pageBuilder: (context, state) => customTransitionPage(
+              key: state.pageKey,
+              child: const SecurityScreen(),
+            ),
+          ),
+          GoRoute(
+            path: 'payment',
+            pageBuilder: (context, state) => customTransitionPage(
+              key: state.pageKey,
+              child: const PaymentMethodsScreen(),
+            ),
+          ),
+          GoRoute(
+            path: 'notifications',
+            pageBuilder: (context, state) => customTransitionPage(
+              key: state.pageKey,
+              child: const NotificationsSettingsScreen(),
+            ),
+          ),
+          GoRoute(
+            path: 'help',
+            pageBuilder: (context, state) => customTransitionPage(
+              key: state.pageKey,
+              child: const HelpCenterScreen(),
+            ),
+          ),
+          GoRoute(
+            path: 'privacy',
+            pageBuilder: (context, state) => customTransitionPage(
+              key: state.pageKey,
+              child: const PrivacyPolicyScreen(),
+            ),
+          ),
+        ],
       ),
       GoRoute(
         path: '/kyc',

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../data/models/listing_model.dart';
-import '../../../ui/widgets/glass/glass_container.dart';
-import '../../../ui/widgets/glass/glass_button.dart';
+import 'package:flippa/data/models/listing_model.dart';
+import 'package:flippa/ui/widgets/glass/glass_container.dart';
+import 'package:flippa/ui/widgets/glass/glass_button.dart';
 
 class EscrowContractScreen extends StatefulWidget {
   final ListingModel listing;
@@ -61,7 +61,7 @@ class _EscrowContractScreenState extends State<EscrowContractScreen> {
                 ? const Center(child: CircularProgressIndicator())
                 : GlassButton(
                     label: "Sign & Secure Funds",
-                    onPressed: _termsAccepted ? _handleSignContract : null,
+                    onPressed: _termsAccepted ? () => _handleSignContract() : null,
                     width: double.infinity,
                     color: const Color(0xFF1E1E2C),
                   ),

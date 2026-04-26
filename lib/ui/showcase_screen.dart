@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../ui/widgets/glass/glass_container.dart';
-import '../../ui/widgets/glass/glass_button.dart';
+import 'package:flippa/ui/widgets/glass/glass_container.dart';
+import 'package:flippa/ui/widgets/glass/glass_button.dart';
 
 class UIShowcaseScreen extends StatelessWidget {
   const UIShowcaseScreen({super.key});

@@ -3,14 +3,17 @@ import 'glass_container.dart';
 
 class GlassButton extends StatelessWidget {
   final String label;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final double? width;
+
+  final Color? color;
 
   const GlassButton({
     super.key,
     required this.label,
     required this.onPressed,
     this.width,
+    this.color,
   });
 
   @override
@@ -24,14 +27,14 @@ class GlassButton extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {
+          onTap: onPressed == null ? null : () {
             debugPrint('GlassButton tapped: $label');
-            onPressed();
+            onPressed!();
           },
           child: GlassContainer(
             padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
             blur: 10,
-            background: Colors.white.withOpacity(0.1),
+            background: color ?? Colors.white.withOpacity(0.1),
             child: Center(
               child: Text(
                 label,

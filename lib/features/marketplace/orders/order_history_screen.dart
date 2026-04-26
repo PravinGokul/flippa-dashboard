@@ -24,13 +24,27 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> with SingleTick
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
       appBar: AppBar(
+        leadingWidth: 100,
+        leading: InkWell(
+          onTap: () => context.pop(),
+          child: const Padding(
+            padding: EdgeInsets.only(left: 16),
+            child: Row(
+              children: [
+                Icon(Icons.chevron_left, color: Color(0xFF64748B)),
+                Text("Back", style: TextStyle(color: Color(0xFF64748B), fontWeight: FontWeight.bold, fontSize: 16)),
+              ],
+            ),
+          ),
+        ),
+        title: const Text(
+          "My Orders",
+          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 28, color: Color(0xFF1E293B)),
+        ),
+        centerTitle: false,
+        toolbarHeight: 140,
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF1E1E2C)),
-          onPressed: () => context.pop(),
-        ),
-        title: const Text("My Orders", style: TextStyle(color: Color(0xFF1E1E2C), fontWeight: FontWeight.bold)),
         bottom: TabBar(
           controller: _tabController,
           labelColor: const Color(0xFF1E1E2C),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../ui/widgets/glass/glass_container.dart';
+import 'package:flippa/ui/widgets/glass/glass_container.dart';
 
 class KYCVerificationScreen extends StatefulWidget {
   const KYCVerificationScreen({super.key});

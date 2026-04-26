@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../ui/widgets/glass/glass_container.dart';
+import 'package:flippa/ui/widgets/glass/glass_container.dart';
 
 class AdminDisputeScreen extends StatefulWidget {
   const AdminDisputeScreen({super.key});
@@ -43,7 +43,19 @@ class _AdminDisputeScreenState extends State<AdminDisputeScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
       appBar: AppBar(
-        toolbarHeight: 80,
+        leadingWidth: 100,
+        leading: InkWell(
+          onTap: () => Navigator.pop(context),
+          child: const Padding(
+            padding: EdgeInsets.only(left: 16),
+            child: Row(
+              children: [
+                Icon(Icons.chevron_left, color: Color(0xFF64748B)),
+                Text("Back", style: TextStyle(color: Color(0xFF64748B), fontWeight: FontWeight.bold, fontSize: 16)),
+              ],
+            ),
+          ),
+        ),
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -57,6 +69,7 @@ class _AdminDisputeScreenState extends State<AdminDisputeScreen> {
             ),
           ],
         ),
+        toolbarHeight: 120,
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: const Color(0xFF1E1E2C),

@@ -21,6 +21,7 @@ class ListingModel {
   final DateTime? createdAt;
   final double? latitude;
   final double? longitude;
+  final String? genre;
 
   ListingModel({
     required this.id,
@@ -45,6 +46,7 @@ class ListingModel {
     this.createdAt,
     this.latitude,
     this.longitude,
+    this.genre,
   });
 
   factory ListingModel.fromJson(Map<String, dynamic> json) {
