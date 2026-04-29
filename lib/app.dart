@@ -33,6 +33,8 @@ class FlippaApp extends StatelessWidget {
               title: 'Flippa',
               debugShowCheckedModeBanner: false,
               theme: GlassTheme.lightTheme,
+              darkTheme: GlassTheme.darkTheme,
+              themeMode: state.themeMode,
               routerConfig: AppRouter.router,
               locale: state.locale,
               supportedLocales: const [

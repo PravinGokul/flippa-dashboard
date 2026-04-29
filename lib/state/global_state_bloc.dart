@@ -10,6 +10,7 @@ abstract class GlobalState with _$GlobalState {
     @Default(Locale('en', 'US')) Locale locale,
     @Default('USD') String currency,
     @Default(1.0) double exchangeRate, // Relative to USD
+    @Default(ThemeMode.system) ThemeMode themeMode,
   }) = _GlobalState;
 }
 
@@ -17,10 +18,15 @@ abstract class GlobalState with _$GlobalState {
 abstract class GlobalEvent with _$GlobalEvent {
   const factory GlobalEvent.changeLanguage(Locale locale) = _ChangeLanguage;
   const factory GlobalEvent.changeCurrency(String currencyCode) = _ChangeCurrency;
+  const factory GlobalEvent.toggleTheme(ThemeMode mode) = _ToggleTheme;
 }
 
 class GlobalBloc extends Bloc<GlobalEvent, GlobalState> {
   GlobalBloc() : super(const GlobalState()) {
+    on<_ToggleTheme>((event, emit) {
+      emit(state.copyWith(themeMode: event.mode));
+    });
+    
     on<_ChangeLanguage>((event, emit) {
       emit(state.copyWith(locale: event.locale));
     });

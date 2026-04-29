@@ -19,11 +19,11 @@ class SummaryTab extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHeader(),
+                _buildHeader(context),
                 const SizedBox(height: 32),
-                _buildStatsGrid(),
+                _buildStatsGrid(context),
                 const SizedBox(height: 32),
-                _buildMainContent(),
+                _buildMainContent(context),
                 const SizedBox(height: 40),
               ],
             ),
@@ -33,26 +33,30 @@ class SummaryTab extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? Colors.white : const Color(0xFF1E293B);
+    final subtitleColor = isDark ? Colors.white70 : const Color(0xFF64748B);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               "My Dashboard",
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: Color(0xFF1E293B)),
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: titleColor),
             ),
             const SizedBox(height: 4),
             Row(
               children: [
                 Text(FirebaseAuth.instance.currentUser?.displayName ?? "Pravin Gokul", 
-                  style: const TextStyle(color: Color(0xFF64748B), fontSize: 14)),
+                  style: TextStyle(color: subtitleColor, fontSize: 14)),
                 const SizedBox(width: 4),
-                const Icon(Icons.circle, size: 4, color: Color(0xFF94A3B8)),
+                Icon(Icons.circle, size: 4, color: isDark ? Colors.white30 : const Color(0xFF94A3B8)),
                 const SizedBox(width: 4),
-                const Text("Verified Seller", style: TextStyle(color: Color(0xFF64748B), fontSize: 14)),
+                Text("Verified Seller", style: TextStyle(color: subtitleColor, fontSize: 14)),
                 const SizedBox(width: 4),
                 const Icon(Icons.check_circle, color: Color(0xFF3B82F6), size: 14),
               ],
@@ -78,7 +82,7 @@ class SummaryTab extends StatelessWidget {
     );
   }
 
-  Widget _buildStatsGrid() {
+  Widget _buildStatsGrid(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth > 900;
@@ -93,17 +97,21 @@ class SummaryTab extends StatelessWidget {
           mainAxisSpacing: 16,
           childAspectRatio: 1.15, // Fixed to prevent bottom overflow
           children: [
-            _buildStatCard("Active Rentals", "14", "+3%", Icons.home_rounded, Colors.purple),
-            _buildStatCard("Total Revenue", "\$48,650", null, Icons.monetization_on_rounded, Colors.teal),
-            _buildStatCard("Seller Rating", "4.9", "112 Reviews", Icons.star_rounded, Colors.amber),
-            _buildStatCard("Active Guests", "19", "-1%", Icons.people_rounded, Colors.blue),
+            _buildStatCard(context, "Active Rentals", "14", "+3%", Icons.home_rounded, Colors.purple),
+            _buildStatCard(context, "Total Revenue", "\$48,650", null, Icons.monetization_on_rounded, Colors.teal),
+            _buildStatCard(context, "Seller Rating", "4.9", "112 Reviews", Icons.star_rounded, Colors.amber),
+            _buildStatCard(context, "Active Guests", "19", "-1%", Icons.people_rounded, Colors.blue),
           ],
         );
       }
     );
   }
 
-  Widget _buildStatCard(String title, String value, String? trend, IconData icon, Color color) {
+  Widget _buildStatCard(BuildContext context, String title, String value, String? trend, IconData icon, Color color) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final valueColor = isDark ? Colors.white : const Color(0xFF1E293B);
+    final labelColor = isDark ? Colors.white60 : const Color(0xFF94A3B8);
+
     return GlassContainer(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -152,11 +160,11 @@ class SummaryTab extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(value, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF1E293B))),
+              Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: valueColor)),
               const SizedBox(height: 2),
               Text(
                 title, 
-                style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11, fontWeight: FontWeight.w600),
+                style: TextStyle(color: labelColor, fontSize: 11, fontWeight: FontWeight.w600),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -172,7 +180,7 @@ class SummaryTab extends StatelessWidget {
     );
   }
 
-  Widget _buildMainContent() {
+  Widget _buildMainContent(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth > 900;
@@ -180,24 +188,27 @@ class SummaryTab extends StatelessWidget {
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(flex: 2, child: _buildRevenueSection()),
+              Expanded(flex: 2, child: _buildRevenueSection(context)),
               const SizedBox(width: 24),
-              Expanded(flex: 1, child: _buildRecentActivity()),
+              Expanded(flex: 1, child: _buildRecentActivity(context)),
             ],
           );
         }
         return Column(
           children: [
-            _buildRevenueSection(),
+            _buildRevenueSection(context),
             const SizedBox(height: 32),
-            _buildRecentActivity(),
+            _buildRecentActivity(context),
           ],
         );
       },
     );
   }
 
-  Widget _buildRevenueSection() {
+  Widget _buildRevenueSection(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? Colors.white : const Color(0xFF1E293B);
+
     return GlassContainer(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -205,18 +216,18 @@ class SummaryTab extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("Revenue Trends", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+              Text("Revenue Trends", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: titleColor)),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
+                  color: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFF1F5F9),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Text("Last 30 Days", style: TextStyle(fontSize: 12, color: Color(0xFF64748B))),
-                    SizedBox(width: 4),
-                    Icon(Icons.keyboard_arrow_down, size: 16, color: Color(0xFF64748B)),
+                    Text("Last 30 Days", style: TextStyle(fontSize: 12, color: isDark ? Colors.white60 : const Color(0xFF64748B))),
+                    const SizedBox(width: 4),
+                    Icon(Icons.keyboard_arrow_down, size: 16, color: isDark ? Colors.white60 : const Color(0xFF64748B)),
                   ],
                 ),
               ),
@@ -232,20 +243,27 @@ class SummaryTab extends StatelessWidget {
     );
   }
 
-  Widget _buildRecentActivity() {
+  Widget _buildRecentActivity(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? Colors.white : const Color(0xFF1E293B);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Recent Activity", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+        Text("Recent Activity", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: titleColor)),
         const SizedBox(height: 16),
-        _buildActivityItem(Icons.calendar_today_rounded, "New Booking", "2 mins ago", Colors.blue),
-        _buildActivityItem(Icons.payments_rounded, "Payment Received", "45 mins ago", Colors.green),
-        _buildActivityItem(Icons.person_pin_rounded, "Guest Check-in", "2 hours ago", Colors.orange),
+        _buildActivityItem(context, Icons.calendar_today_rounded, "New Booking", "2 mins ago", Colors.blue),
+        _buildActivityItem(context, Icons.payments_rounded, "Payment Received", "45 mins ago", Colors.green),
+        _buildActivityItem(context, Icons.person_pin_rounded, "Guest Check-in", "2 hours ago", Colors.orange),
       ],
     );
   }
 
-  Widget _buildActivityItem(IconData icon, String title, String time, Color color) {
+  Widget _buildActivityItem(BuildContext context, IconData icon, String title, String time, Color color) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? Colors.white : const Color(0xFF1E293B);
+    final timeColor = isDark ? Colors.white60 : const Color(0xFF94A3B8);
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: GlassContainer(
@@ -265,12 +283,12 @@ class SummaryTab extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF1E293B))),
-                  Text(time, style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8))),
+                  Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: titleColor)),
+                  Text(time, style: TextStyle(fontSize: 12, color: timeColor)),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: Color(0xFFE2E8F0)),
+            Icon(Icons.chevron_right, color: isDark ? Colors.white24 : const Color(0xFFE2E8F0)),
           ],
         ),
       ),

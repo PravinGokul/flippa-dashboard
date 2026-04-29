@@ -37,40 +37,48 @@ class MainShell extends StatelessWidget {
   }
 
   PreferredSizeWidget _buildDesktopHeader(BuildContext context, int currentIndex) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? Colors.white : const Color(0xFF1E293B);
+    final navBgColor = isDark ? Colors.black.withOpacity(0.4) : Colors.white.withOpacity(0.7);
+    final dividerColor = isDark ? Colors.white.withOpacity(0.1) : Colors.white.withOpacity(0.3);
+    final iconColor = isDark ? Colors.white70 : const Color(0xFF64748B);
+    final avatarBgColor = isDark ? Colors.white12 : const Color(0xFFE2E8F0);
+    final avatarIconColor = isDark ? Colors.white : const Color(0xFF94A3B8);
+
     return PreferredSize(
       preferredSize: const Size.fromHeight(kToolbarHeight),
       child: ClipRect(
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: AppBar(
-            backgroundColor: Colors.white.withOpacity(0.7),
+            backgroundColor: navBgColor,
             elevation: 0,
             centerTitle: true,
             title: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [
-                  const Text("Flippa", style: TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.bold, fontSize: 24)),
+                  Text("Flippa", style: TextStyle(color: titleColor, fontWeight: FontWeight.bold, fontSize: 24)),
                   const SizedBox(width: 40),
-                  _headerNavButton(context, "Home", 0, currentIndex),
-                  _headerNavButton(context, "Marketplace", 1, currentIndex),
-                  _headerNavButton(context, "Dashboard", 2, currentIndex),
-                  _headerNavButton(context, "My Flippa", 3, currentIndex),
-                  if (currentIndex == 4) _headerNavButton(context, "Admin", 4, currentIndex),
+                  _headerNavButton(context, "Home", 0, currentIndex, isDark),
+                  _headerNavButton(context, "Marketplace", 1, currentIndex, isDark),
+                  _headerNavButton(context, "Dashboard", 2, currentIndex, isDark),
+                  _headerNavButton(context, "My Flippa", 3, currentIndex, isDark),
+                  if (currentIndex == 4) _headerNavButton(context, "Admin", 4, currentIndex, isDark),
                   const Spacer(),
-                  const Icon(Icons.notifications_none, color: Color(0xFF64748B)),
+                  Icon(Icons.notifications_none, color: iconColor),
                   const SizedBox(width: 16),
-                  const CircleAvatar(
+                  CircleAvatar(
                     radius: 16,
-                    backgroundColor: Color(0xFFE2E8F0),
-                    child: Icon(Icons.person, color: Color(0xFF94A3B8), size: 20),
+                    backgroundColor: avatarBgColor,
+                    child: Icon(Icons.person, color: avatarIconColor, size: 20),
                   ),
                 ],
               ),
             ),
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(1),
-              child: Container(color: Colors.white.withOpacity(0.3), height: 1),
+              child: Container(color: dividerColor, height: 1),
             ),
           ),
         ),
@@ -78,8 +86,11 @@ class MainShell extends StatelessWidget {
     );
   }
 
-  Widget _headerNavButton(BuildContext context, String label, int index, int currentIndex) {
+  Widget _headerNavButton(BuildContext context, String label, int index, int currentIndex, bool isDark) {
     final isSelected = index == currentIndex;
+    final selectedColor = isDark ? const Color(0xFFA78BFA) : const Color(0xFF7C3AED);
+    final unselectedColor = isDark ? Colors.white60 : const Color(0xFF64748B);
+
     return TextButton(
       onPressed: () {
         switch (index) {
@@ -93,7 +104,7 @@ class MainShell extends StatelessWidget {
       child: Text(
         label,
         style: TextStyle(
-          color: isSelected ? const Color(0xFF7C3AED) : const Color(0xFF64748B),
+          color: isSelected ? selectedColor : unselectedColor,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
         ),
       ),
@@ -101,13 +112,19 @@ class MainShell extends StatelessWidget {
   }
 
   Widget _buildMobileBottomNav(BuildContext context, int currentIndex) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final navBgColor = isDark ? Colors.black.withOpacity(0.4) : Colors.white.withOpacity(0.7);
+    final borderColor = isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200]!.withOpacity(0.5);
+    final selectedColor = isDark ? const Color(0xFFA78BFA) : const Color(0xFF7C3AED);
+    final unselectedColor = isDark ? Colors.white54 : const Color(0xFF94A3B8);
+
     return ClipRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.7),
-            border: Border(top: BorderSide(color: Colors.grey[200]!.withOpacity(0.5))),
+            color: navBgColor,
+            border: Border(top: BorderSide(color: borderColor)),
           ),
           child: BottomNavigationBar(
             currentIndex: currentIndex,
@@ -122,8 +139,8 @@ class MainShell extends StatelessWidget {
             },
             type: BottomNavigationBarType.fixed,
             backgroundColor: Colors.transparent,
-            selectedItemColor: const Color(0xFF7C3AED),
-            unselectedItemColor: const Color(0xFF94A3B8),
+            selectedItemColor: selectedColor,
+            unselectedItemColor: unselectedColor,
             selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
             unselectedLabelStyle: const TextStyle(fontSize: 11),
             elevation: 0,

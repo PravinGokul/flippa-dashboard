@@ -14,7 +14,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$GlobalState {
 
- Locale get locale; String get currency; double get exchangeRate;
+ Locale get locale; String get currency; double get exchangeRate;// Relative to USD
+ ThemeMode get themeMode;
 /// Create a copy of GlobalState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +26,16 @@ $GlobalStateCopyWith<GlobalState> get copyWith => _$GlobalStateCopyWithImpl<Glob
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is GlobalState&&(identical(other.locale, locale) || other.locale == locale)&&(identical(other.currency, currency) || other.currency == currency)&&(identical(other.exchangeRate, exchangeRate) || other.exchangeRate == exchangeRate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GlobalState&&(identical(other.locale, locale) || other.locale == locale)&&(identical(other.currency, currency) || other.currency == currency)&&(identical(other.exchangeRate, exchangeRate) || other.exchangeRate == exchangeRate)&&(identical(other.themeMode, themeMode) || other.themeMode == themeMode));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,locale,currency,exchangeRate);
+int get hashCode => Object.hash(runtimeType,locale,currency,exchangeRate,themeMode);
 
 @override
 String toString() {
-  return 'GlobalState(locale: $locale, currency: $currency, exchangeRate: $exchangeRate)';
+  return 'GlobalState(locale: $locale, currency: $currency, exchangeRate: $exchangeRate, themeMode: $themeMode)';
 }
 
 
@@ -45,7 +46,7 @@ abstract mixin class $GlobalStateCopyWith<$Res>  {
   factory $GlobalStateCopyWith(GlobalState value, $Res Function(GlobalState) _then) = _$GlobalStateCopyWithImpl;
 @useResult
 $Res call({
- Locale locale, String currency, double exchangeRate
+ Locale locale, String currency, double exchangeRate, ThemeMode themeMode
 });
 
 
@@ -62,12 +63,13 @@ class _$GlobalStateCopyWithImpl<$Res>
 
 /// Create a copy of GlobalState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? locale = null,Object? currency = null,Object? exchangeRate = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? locale = null,Object? currency = null,Object? exchangeRate = null,Object? themeMode = null,}) {
   return _then(_self.copyWith(
 locale: null == locale ? _self.locale : locale // ignore: cast_nullable_to_non_nullable
 as Locale,currency: null == currency ? _self.currency : currency // ignore: cast_nullable_to_non_nullable
 as String,exchangeRate: null == exchangeRate ? _self.exchangeRate : exchangeRate // ignore: cast_nullable_to_non_nullable
-as double,
+as double,themeMode: null == themeMode ? _self.themeMode : themeMode // ignore: cast_nullable_to_non_nullable
+as ThemeMode,
   ));
 }
 
@@ -152,10 +154,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Locale locale,  String currency,  double exchangeRate)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Locale locale,  String currency,  double exchangeRate,  ThemeMode themeMode)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _GlobalState() when $default != null:
-return $default(_that.locale,_that.currency,_that.exchangeRate);case _:
+return $default(_that.locale,_that.currency,_that.exchangeRate,_that.themeMode);case _:
   return orElse();
 
 }
@@ -173,10 +175,10 @@ return $default(_that.locale,_that.currency,_that.exchangeRate);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Locale locale,  String currency,  double exchangeRate)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Locale locale,  String currency,  double exchangeRate,  ThemeMode themeMode)  $default,) {final _that = this;
 switch (_that) {
 case _GlobalState():
-return $default(_that.locale,_that.currency,_that.exchangeRate);case _:
+return $default(_that.locale,_that.currency,_that.exchangeRate,_that.themeMode);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -193,10 +195,10 @@ return $default(_that.locale,_that.currency,_that.exchangeRate);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Locale locale,  String currency,  double exchangeRate)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Locale locale,  String currency,  double exchangeRate,  ThemeMode themeMode)?  $default,) {final _that = this;
 switch (_that) {
 case _GlobalState() when $default != null:
-return $default(_that.locale,_that.currency,_that.exchangeRate);case _:
+return $default(_that.locale,_that.currency,_that.exchangeRate,_that.themeMode);case _:
   return null;
 
 }
@@ -208,12 +210,14 @@ return $default(_that.locale,_that.currency,_that.exchangeRate);case _:
 
 
 class _GlobalState implements GlobalState {
-  const _GlobalState({this.locale = const Locale('en', 'US'), this.currency = 'USD', this.exchangeRate = 1.0});
+  const _GlobalState({this.locale = const Locale('en', 'US'), this.currency = 'USD', this.exchangeRate = 1.0, this.themeMode = ThemeMode.system});
   
 
 @override@JsonKey() final  Locale locale;
 @override@JsonKey() final  String currency;
 @override@JsonKey() final  double exchangeRate;
+// Relative to USD
+@override@JsonKey() final  ThemeMode themeMode;
 
 /// Create a copy of GlobalState
 /// with the given fields replaced by the non-null parameter values.
@@ -225,16 +229,16 @@ _$GlobalStateCopyWith<_GlobalState> get copyWith => __$GlobalStateCopyWithImpl<_
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GlobalState&&(identical(other.locale, locale) || other.locale == locale)&&(identical(other.currency, currency) || other.currency == currency)&&(identical(other.exchangeRate, exchangeRate) || other.exchangeRate == exchangeRate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GlobalState&&(identical(other.locale, locale) || other.locale == locale)&&(identical(other.currency, currency) || other.currency == currency)&&(identical(other.exchangeRate, exchangeRate) || other.exchangeRate == exchangeRate)&&(identical(other.themeMode, themeMode) || other.themeMode == themeMode));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,locale,currency,exchangeRate);
+int get hashCode => Object.hash(runtimeType,locale,currency,exchangeRate,themeMode);
 
 @override
 String toString() {
-  return 'GlobalState(locale: $locale, currency: $currency, exchangeRate: $exchangeRate)';
+  return 'GlobalState(locale: $locale, currency: $currency, exchangeRate: $exchangeRate, themeMode: $themeMode)';
 }
 
 
@@ -245,7 +249,7 @@ abstract mixin class _$GlobalStateCopyWith<$Res> implements $GlobalStateCopyWith
   factory _$GlobalStateCopyWith(_GlobalState value, $Res Function(_GlobalState) _then) = __$GlobalStateCopyWithImpl;
 @override @useResult
 $Res call({
- Locale locale, String currency, double exchangeRate
+ Locale locale, String currency, double exchangeRate, ThemeMode themeMode
 });
 
 
@@ -262,12 +266,13 @@ class __$GlobalStateCopyWithImpl<$Res>
 
 /// Create a copy of GlobalState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? locale = null,Object? currency = null,Object? exchangeRate = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? locale = null,Object? currency = null,Object? exchangeRate = null,Object? themeMode = null,}) {
   return _then(_GlobalState(
 locale: null == locale ? _self.locale : locale // ignore: cast_nullable_to_non_nullable
 as Locale,currency: null == currency ? _self.currency : currency // ignore: cast_nullable_to_non_nullable
 as String,exchangeRate: null == exchangeRate ? _self.exchangeRate : exchangeRate // ignore: cast_nullable_to_non_nullable
-as double,
+as double,themeMode: null == themeMode ? _self.themeMode : themeMode // ignore: cast_nullable_to_non_nullable
+as ThemeMode,
   ));
 }
 
@@ -318,12 +323,13 @@ extension GlobalEventPatterns on GlobalEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _ChangeLanguage value)?  changeLanguage,TResult Function( _ChangeCurrency value)?  changeCurrency,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _ChangeLanguage value)?  changeLanguage,TResult Function( _ChangeCurrency value)?  changeCurrency,TResult Function( _ToggleTheme value)?  toggleTheme,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _ChangeLanguage() when changeLanguage != null:
 return changeLanguage(_that);case _ChangeCurrency() when changeCurrency != null:
-return changeCurrency(_that);case _:
+return changeCurrency(_that);case _ToggleTheme() when toggleTheme != null:
+return toggleTheme(_that);case _:
   return orElse();
 
 }
@@ -341,12 +347,13 @@ return changeCurrency(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _ChangeLanguage value)  changeLanguage,required TResult Function( _ChangeCurrency value)  changeCurrency,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _ChangeLanguage value)  changeLanguage,required TResult Function( _ChangeCurrency value)  changeCurrency,required TResult Function( _ToggleTheme value)  toggleTheme,}){
 final _that = this;
 switch (_that) {
 case _ChangeLanguage():
 return changeLanguage(_that);case _ChangeCurrency():
-return changeCurrency(_that);case _:
+return changeCurrency(_that);case _ToggleTheme():
+return toggleTheme(_that);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -363,12 +370,13 @@ return changeCurrency(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _ChangeLanguage value)?  changeLanguage,TResult? Function( _ChangeCurrency value)?  changeCurrency,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _ChangeLanguage value)?  changeLanguage,TResult? Function( _ChangeCurrency value)?  changeCurrency,TResult? Function( _ToggleTheme value)?  toggleTheme,}){
 final _that = this;
 switch (_that) {
 case _ChangeLanguage() when changeLanguage != null:
 return changeLanguage(_that);case _ChangeCurrency() when changeCurrency != null:
-return changeCurrency(_that);case _:
+return changeCurrency(_that);case _ToggleTheme() when toggleTheme != null:
+return toggleTheme(_that);case _:
   return null;
 
 }
@@ -385,11 +393,12 @@ return changeCurrency(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( Locale locale)?  changeLanguage,TResult Function( String currencyCode)?  changeCurrency,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( Locale locale)?  changeLanguage,TResult Function( String currencyCode)?  changeCurrency,TResult Function( ThemeMode mode)?  toggleTheme,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ChangeLanguage() when changeLanguage != null:
 return changeLanguage(_that.locale);case _ChangeCurrency() when changeCurrency != null:
-return changeCurrency(_that.currencyCode);case _:
+return changeCurrency(_that.currencyCode);case _ToggleTheme() when toggleTheme != null:
+return toggleTheme(_that.mode);case _:
   return orElse();
 
 }
@@ -407,11 +416,12 @@ return changeCurrency(_that.currencyCode);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( Locale locale)  changeLanguage,required TResult Function( String currencyCode)  changeCurrency,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( Locale locale)  changeLanguage,required TResult Function( String currencyCode)  changeCurrency,required TResult Function( ThemeMode mode)  toggleTheme,}) {final _that = this;
 switch (_that) {
 case _ChangeLanguage():
 return changeLanguage(_that.locale);case _ChangeCurrency():
-return changeCurrency(_that.currencyCode);case _:
+return changeCurrency(_that.currencyCode);case _ToggleTheme():
+return toggleTheme(_that.mode);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -428,11 +438,12 @@ return changeCurrency(_that.currencyCode);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( Locale locale)?  changeLanguage,TResult? Function( String currencyCode)?  changeCurrency,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( Locale locale)?  changeLanguage,TResult? Function( String currencyCode)?  changeCurrency,TResult? Function( ThemeMode mode)?  toggleTheme,}) {final _that = this;
 switch (_that) {
 case _ChangeLanguage() when changeLanguage != null:
 return changeLanguage(_that.locale);case _ChangeCurrency() when changeCurrency != null:
-return changeCurrency(_that.currencyCode);case _:
+return changeCurrency(_that.currencyCode);case _ToggleTheme() when toggleTheme != null:
+return toggleTheme(_that.mode);case _:
   return null;
 
 }
@@ -566,6 +577,72 @@ class __$ChangeCurrencyCopyWithImpl<$Res>
   return _then(_ChangeCurrency(
 null == currencyCode ? _self.currencyCode : currencyCode // ignore: cast_nullable_to_non_nullable
 as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class _ToggleTheme implements GlobalEvent {
+  const _ToggleTheme(this.mode);
+  
+
+ final  ThemeMode mode;
+
+/// Create a copy of GlobalEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ToggleThemeCopyWith<_ToggleTheme> get copyWith => __$ToggleThemeCopyWithImpl<_ToggleTheme>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ToggleTheme&&(identical(other.mode, mode) || other.mode == mode));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,mode);
+
+@override
+String toString() {
+  return 'GlobalEvent.toggleTheme(mode: $mode)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ToggleThemeCopyWith<$Res> implements $GlobalEventCopyWith<$Res> {
+  factory _$ToggleThemeCopyWith(_ToggleTheme value, $Res Function(_ToggleTheme) _then) = __$ToggleThemeCopyWithImpl;
+@useResult
+$Res call({
+ ThemeMode mode
+});
+
+
+
+
+}
+/// @nodoc
+class __$ToggleThemeCopyWithImpl<$Res>
+    implements _$ToggleThemeCopyWith<$Res> {
+  __$ToggleThemeCopyWithImpl(this._self, this._then);
+
+  final _ToggleTheme _self;
+  final $Res Function(_ToggleTheme) _then;
+
+/// Create a copy of GlobalEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? mode = null,}) {
+  return _then(_ToggleTheme(
+null == mode ? _self.mode : mode // ignore: cast_nullable_to_non_nullable
+as ThemeMode,
   ));
 }
 
