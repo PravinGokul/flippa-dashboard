@@ -41,7 +41,10 @@ class AuthService {
       if (kIsWeb) {
         // Web: Use signInWithPopup
         final GoogleAuthProvider authProvider = GoogleAuthProvider();
-        userCredential = await _auth.signInWithPopup(authProvider);
+        userCredential = await _auth.signInWithPopup(authProvider).timeout(
+          const Duration(seconds: 15),
+          onTimeout: () => throw Exception('Sign-in timed out. Please check if popups are blocked.'),
+        );
       } else {
         // Android/iOS: Use GoogleSignIn package
         final googleSignIn = GoogleSignIn();

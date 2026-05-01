@@ -108,6 +108,14 @@ class _ListingDetailScreenState extends State<ListingDetailScreen> with SingleTi
             Image.network(
               widget.listing.imageUrls?.first ?? 'https://via.placeholder.com/600x800',
               fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  color: Colors.grey[300],
+                  child: const Center(
+                    child: Icon(Icons.image_not_supported, color: Colors.grey, size: 50),
+                  ),
+                );
+              },
             ),
             Container(
               decoration: BoxDecoration(
