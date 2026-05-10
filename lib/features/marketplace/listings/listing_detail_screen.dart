@@ -106,7 +106,7 @@ class _ListingDetailScreenState extends State<ListingDetailScreen> with SingleTi
           fit: StackFit.expand,
           children: [
             Image.network(
-              widget.listing.imageUrls?.first ?? 'https://via.placeholder.com/600x800',
+              (widget.listing.imageUrls?.isNotEmpty == true) ? widget.listing.imageUrls!.first : 'https://via.placeholder.com/600x800',
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
                 return Container(
@@ -146,7 +146,9 @@ class _ListingDetailScreenState extends State<ListingDetailScreen> with SingleTi
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -159,8 +161,8 @@ class _ListingDetailScreenState extends State<ListingDetailScreen> with SingleTi
                     style: const TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold, fontSize: 12),
                   ),
                 ),
-                const Spacer(),
                 Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(Icons.star, color: Colors.orange, size: 20),
                     const SizedBox(width: 4),
@@ -183,14 +185,15 @@ class _ListingDetailScreenState extends State<ListingDetailScreen> with SingleTi
               style: const TextStyle(fontSize: 18, color: Color(0xFF6B7280)),
             ),
             const SizedBox(height: 24),
-            Row(
+            Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 16,
               children: [
                 Text(
                   CurrencyService.format(widget.listing.priceSale ?? 0.0, currency, exchangeRate: rate),
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Color(0xFF1E1E2C)),
                 ),
                 if (widget.listing.isAvailableForRent) ...[
-                  const SizedBox(width: 16),
                   Text(
                     "Rent ${CurrencyService.format(widget.listing.priceRentDaily ?? 0.0, currency, exchangeRate: rate)}/d",
                     style: const TextStyle(fontSize: 16, color: Colors.blueAccent, fontWeight: FontWeight.w600),
@@ -205,8 +208,10 @@ class _ListingDetailScreenState extends State<ListingDetailScreen> with SingleTi
   }
 
   Widget _buildStatsRow() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Wrap(
+      spacing: 16,
+      runSpacing: 16,
+      alignment: WrapAlignment.spaceBetween,
       children: [
         _buildStatItem(Icons.library_books_outlined, "8 Bookings"),
         _buildStatItem(Icons.visibility_outlined, "142 Views"),

@@ -41,7 +41,7 @@ class GlassButton extends StatelessWidget {
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
-                  color: const Color(0xFF1E1E2C),
+                  color: color == null ? const Color(0xFF1E1E2C) : Colors.white,
                 ),
               ),
             ),

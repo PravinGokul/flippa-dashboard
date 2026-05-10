@@ -12,10 +12,13 @@ class AvailabilityCalendar extends StatefulWidget {
 }
 
 class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
-  DateTime _focusedDay = DateTime.now();
+  DateTime _focusedDay = DateTime.now().toUtc();
   DateTime? _rangeStart;
   DateTime? _rangeEnd;
   CalendarFormat _calendarFormat = CalendarFormat.month;
+
+  final DateTime _firstDay = DateTime.now().toUtc().subtract(const Duration(days: 1));
+  final DateTime _lastDay = DateTime.now().toUtc().add(const Duration(days: 365));
 
   double get _totalPrice {
     if (_rangeStart == null || _rangeEnd == null) return 0;
@@ -49,8 +52,8 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
               ),
               const SizedBox(height: 16),
               TableCalendar(
-                firstDay: DateTime.now(),
-                lastDay: DateTime.now().add(const Duration(days: 365)),
+                firstDay: _firstDay,
+                lastDay: _lastDay,
                 focusedDay: _focusedDay,
                 calendarFormat: _calendarFormat,
                 rangeStartDay: _rangeStart,
